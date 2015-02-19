@@ -1,3 +1,4 @@
+package mainPackage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -5,7 +6,9 @@ import java.io.FileWriter;
 import java.util.Random;
 import java.util.Scanner;
 
-public class StaticMethods
+import javax.swing.JOptionPane;
+
+public class ReadsGenerator
 {
 	public static String getSequence(String SEQUENCE_FILE)
 	{
@@ -23,13 +26,16 @@ public class StaticMethods
 			}
 			return sequence.toString();
 		}
-		catch (FileNotFoundException e) {
+		catch (FileNotFoundException | NullPointerException e) {
+			JOptionPane.showMessageDialog(null, SEQUENCE_FILE + " not found. [" + e.getMessage() + "]");
+			return null;
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	public static void generateReads(String SEQUENCE_FILE, int READ_SIZE, int MINIMUM_OVERLAP_LENGTH,String OUTPUT_FILE)
+	public static String generateReads(String SEQUENCE_FILE, int READ_SIZE, int MINIMUM_OVERLAP_LENGTH,String OUTPUT_FILE)
 	{
 		String sequence = getSequence(SEQUENCE_FILE);
 		BufferedWriter writer;
@@ -85,12 +91,14 @@ public class StaticMethods
 					writer.flush();
 				}
 				
-				System.out.println("Number of reads generated: "+readCount);
 				writer.close();
+				return "Success! Number of reads generated: "+readCount;
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				return e.getMessage();
 			}
+		} else {
+			return "Please review sequence file. It may be an invalid fasta file.";
 		}
 	}
 }

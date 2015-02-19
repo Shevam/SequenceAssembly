@@ -108,6 +108,7 @@ public class OverlapGraphStaticMethods
 		return endString.substring(0, endIndex);
 	}
 	
+	@SuppressWarnings("unused")
 	private static String getSuperString(String startString, String endString)
     {
         String result = startString;

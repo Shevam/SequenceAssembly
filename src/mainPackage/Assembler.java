@@ -1,13 +1,12 @@
+package mainPackage;
 import java.io.File;
-
-import javax.swing.JFrame;
 
 import DeBruijnGraph.DebruijnGraphStaticMethods;
 import Hybrid.HybridStaticMethods;
 import ImprovedDeBruijnGraph.ImprovedDBGStaticMethods;
 import OverlapGraph.OverlapGraphStaticMethods;
 
-public class Main 
+public class Assembler 
 {
 	static final String SEQUENCE_FILE = "BorreliaFull_CompleteSequence.fasta";
 	static final String GENERATED_READS_FILE = "generatedReads.fasta";
@@ -93,10 +92,6 @@ public class Main
 			System.out.println("Graph contruction and contigs generation skipped.");
 			break;
 		}
-		
-		JFrame mainFrame = new MyGui();
-		mainFrame.setVisible(true);
-		mainFrame.setExtendedState(mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		
 		programEndTime = System.nanoTime();
 		System.out.println("Program execution time(ms): " + (programEndTime - programStartTime) / 1000000);
