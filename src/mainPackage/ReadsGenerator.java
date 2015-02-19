@@ -3,102 +3,114 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 
-import javax.swing.JOptionPane;
-
 public class ReadsGenerator
-{
-	public static String getSequence(String SEQUENCE_FILE)
+{	
+	public static String generateReads(String sequenceFile, int readSize, int minOverlapLength,String readsFile)
 	{
-		try (Scanner fileIn = new Scanner(new File(SEQUENCE_FILE))) 
+		String sequence;
+		
+		try (Scanner fileIn = new Scanner(new File(sequenceFile)))
 		{
 			String currentLine = "";
-			StringBuilder sequence = new StringBuilder();
+			StringBuilder sequenceBuilder = new StringBuilder();
 			
 			while (fileIn.hasNextLine())
 			{
 				currentLine = fileIn.nextLine();
 				
 				if (!currentLine.startsWith(">"))
-					sequence.append(currentLine.trim());
+					sequenceBuilder.append(currentLine.trim());
 			}
-			return sequence.toString();
+			sequence = sequenceBuilder.toString();
 		}
 		catch (FileNotFoundException | NullPointerException e) {
-			JOptionPane.showMessageDialog(null, SEQUENCE_FILE + " not found. [" + e.getMessage() + "]");
-			return null;
+			e.printStackTrace();
+			return sequenceFile + " not found. \n\n[" + e.getMessage() + "]";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			return "An error occured while reading sequence. [" + e.getMessage() + "]";
 		}
-	}
-	
-	public static String generateReads(String SEQUENCE_FILE, int READ_SIZE, int MINIMUM_OVERLAP_LENGTH,String OUTPUT_FILE)
-	{
-		String sequence = getSequence(SEQUENCE_FILE);
+		
+		if (sequence == null || sequence.equals("")) {
+			return "Sequence file is invalid. Supported file format content example:\n"
+				+ "\n"
+				+ ">Sequence Name\n"
+				+ "AGTCGAGCA...";
+		}
+		
+		if (sequence.length()<readSize) {
+			return "Sequence length (" + sequence.length() + ") is less than specified read size (" + readSize + ").";
+		}
+		
 		BufferedWriter writer;
-		if(sequence != null && !sequence.equals("") && sequence.length()>READ_SIZE)
+		try 
 		{
-			try 
+			writer = new BufferedWriter(new FileWriter(new File(readsFile)));
+			int sequenceSection=0, readCount=0, lineLength=80;
+			sequenceSection++;
+			int aRandomNumber = new Random().nextInt(readSize - minOverlapLength);
+			while(sequenceSection*readSize<sequence.length())
 			{
-				writer = new BufferedWriter(new FileWriter(new File(OUTPUT_FILE)));
-				int sequenceSection=0, readCount=0, lineLength=80;
-				sequenceSection++;
-				int aRandomNumber = new Random().nextInt(READ_SIZE - MINIMUM_OVERLAP_LENGTH);
-				while(sequenceSection*READ_SIZE<sequence.length())
-				{
-					String circularRead;
-					aRandomNumber = new Random().nextInt(READ_SIZE - MINIMUM_OVERLAP_LENGTH);
-					
-					if (((sequenceSection)*READ_SIZE)+aRandomNumber <= sequence.length()){
-						readCount++;
-						circularRead = sequence.substring(((sequenceSection-1)*READ_SIZE)+aRandomNumber, (sequenceSection*READ_SIZE)+aRandomNumber);
-						writer.write(">r" + readCount + "\n");
-						for(int i=0;i<circularRead.length();i+=lineLength) {
-							if(i+lineLength > circularRead.length())
-								writer.write(circularRead.substring(i) + "\n");
-							else
-								writer.write(circularRead.substring(i, i+lineLength) + "\n");
-						}
-						
-						readCount++;
-						circularRead = sequence.substring((sequenceSection-1)*READ_SIZE, sequenceSection*READ_SIZE);
-						writer.write(">r" + readCount + "\n");
-						for(int i=0;i<circularRead.length();i+=lineLength) {
-							if(i+lineLength > circularRead.length())
-								writer.write(circularRead.substring(i) + "\n");
-							else
-								writer.write(circularRead.substring(i, i+lineLength) + "\n");
-						}
-						sequenceSection++;
-					}
-					else {
-						readCount++;
-						circularRead = sequence.substring(((sequenceSection-1)*READ_SIZE)+aRandomNumber);
-						int remainingNoOfChars = READ_SIZE - circularRead.length();
-						circularRead += sequence.substring(0, remainingNoOfChars);
-						writer.write(">r" + readCount + "\n");
-						for(int i=0;i<circularRead.length();i+=lineLength) {
-							if(i+lineLength > circularRead.length())
-								writer.write(circularRead.substring(i) + "\n");
-							else
-								writer.write(circularRead.substring(i, i+lineLength) + "\n");
-						}
-						break;
-					}
-					writer.flush();
-				}
+				String circularRead;
+				aRandomNumber = new Random().nextInt(readSize - minOverlapLength);
 				
-				writer.close();
-				return "Success! Number of reads generated: "+readCount;
+				if (((sequenceSection)*readSize)+aRandomNumber <= sequence.length()){
+					readCount++;
+					circularRead = sequence.substring(((sequenceSection-1)*readSize)+aRandomNumber, (sequenceSection*readSize)+aRandomNumber);
+					writer.write(">r" + readCount + "\n");
+					for(int i=0;i<circularRead.length();i+=lineLength) {
+						if(i+lineLength > circularRead.length())
+							writer.write(circularRead.substring(i) + "\n");
+						else
+							writer.write(circularRead.substring(i, i+lineLength) + "\n");
+					}
+					
+					readCount++;
+					circularRead = sequence.substring((sequenceSection-1)*readSize, sequenceSection*readSize);
+					writer.write(">r" + readCount + "\n");
+					for(int i=0;i<circularRead.length();i+=lineLength) {
+						if(i+lineLength > circularRead.length())
+							writer.write(circularRead.substring(i) + "\n");
+						else
+							writer.write(circularRead.substring(i, i+lineLength) + "\n");
+					}
+					sequenceSection++;
+				}
+				else {
+					readCount++;
+					circularRead = sequence.substring(((sequenceSection-1)*readSize)+aRandomNumber);
+					int remainingNoOfChars = readSize - circularRead.length();
+					circularRead += sequence.substring(0, remainingNoOfChars);
+					writer.write(">r" + readCount + "\n");
+					for(int i=0;i<circularRead.length();i+=lineLength) {
+						if(i+lineLength > circularRead.length())
+							writer.write(circularRead.substring(i) + "\n");
+						else
+							writer.write(circularRead.substring(i, i+lineLength) + "\n");
+					}
+					break;
+				}
+				writer.flush();
 			}
-			catch (Exception e) {
-				return e.getMessage();
-			}
-		} else {
-			return "Please review sequence file. It may be an invalid fasta file.";
+			
+			writer.close();
+			return "Success! Number of reads generated: "+readCount;
+		}
+		catch (IOException | NullPointerException e) {
+			e.printStackTrace();
+			return "Error in creating, opening or writing output file. [" + e.getMessage() + "]";
+		}
+		catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return "Minimum overlap length cannot be greater or equal to read size.";
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return "Sorry! An error has occurred while generating reads. [" + e.getMessage() + "]";
 		}
 	}
 }

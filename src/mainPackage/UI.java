@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 public class UI {
 
 	public static void main(String[] args) {
-		JFrame f = new MainJFrame();
+		JFrame f = new MainFrame();
 	}
 	
 }
