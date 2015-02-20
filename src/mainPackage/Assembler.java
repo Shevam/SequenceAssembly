@@ -8,28 +8,26 @@ import OverlapGraph.OverlapGraphStaticMethods;
 
 public class Assembler 
 {
-	public enum GraphMethods { DE_BRUIJN, OVERLAP, HYBRID, IMPROVED_DE_BRUIJN };
+	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, HYBRID, IMPROVED_DE_BRUIJN };
 	
 	static final String SEQUENCE_FILE = "BorreliaFull_CompleteSequence.fasta";
-	static final String GENERATED_READS_FILE = "generatedReads.fasta";
+	static final String READS_FILE_NAME = "generatedReads.fasta";
 	static final String GENERATED_CONTIGS_FILE = "generatedContigs.fasta";
-	static final String READS_FILE_NAME = GENERATED_READS_FILE;
-	static final int READ_SIZE = 450;
 	static final int MINIMUM_OVERLAP_LENGTH = 10;
 	static final int KMER_SIZE = 25;
 	
 	static long programStartTime, programEndTime;
 	static long graphConstructionStartTime, graphConstructionEndTime;
 	static long contigGenerationStartTime, contigGenerationEndTime;
-	static GraphMethods graphMethod;
+	static AssemblyMethods assemblyMethod;
 	
 	public static void main(String args[]) 
 	{
-		graphMethod = GraphMethods.DE_BRUIJN;
+		assemblyMethod = AssemblyMethods.DE_BRUIJN;
 		
 		programStartTime = System.nanoTime();
 		
-		switch (graphMethod) {
+		switch (assemblyMethod) {
 		case DE_BRUIJN:
 			System.out.println("Method: DeBruijnGraph");
 			graphConstructionStartTime = System.nanoTime();

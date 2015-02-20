@@ -70,7 +70,7 @@ public class HybridStaticMethods
 		}
 	}
 	
-	public static void generateContigs(String OUTPUT_FILE) 
+	public static void generateContigs(String outputFile) 
     {
 		BufferedWriter writer;
 		LinkedList<Node> contigNodeList;
@@ -80,7 +80,7 @@ public class HybridStaticMethods
 		
 		try
 		{
-			writer = new BufferedWriter(new FileWriter(new File(OUTPUT_FILE)));
+			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
 			while (true)
 			{
 				contigNodeList = new LinkedList<Node>();
@@ -141,7 +141,7 @@ public class HybridStaticMethods
 			writer.close();
 		}
 		catch (FileNotFoundException e) {
-			System.err.println("File not found: " + OUTPUT_FILE);
+			System.err.println("File not found: " + outputFile);
 		}
 		catch (IOException e) {
 			e.printStackTrace();

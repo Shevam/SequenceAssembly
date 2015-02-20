@@ -54,7 +54,7 @@ public class DebruijnGraphStaticMethods
 			DeBruijnGraph.getInstance().addEdge(read.substring(i, i + kmerSize - 1), read.substring(i + 1, i + kmerSize));
 	}
 	
-	public static void generateContigs(String OUTPUT_FILE)
+	public static void generateContigs(String outputFile)
 	{
 		DeBruijnGraph graph;
 		LinkedList<DirectedEdge> contigEdgeList = new LinkedList<DirectedEdge>();
@@ -65,7 +65,7 @@ public class DebruijnGraphStaticMethods
 		try
 		{
 			graph = DeBruijnGraph.getInstance();
-			writer = new BufferedWriter(new FileWriter(new File(OUTPUT_FILE)));
+			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
 			
 			while (true)
 			{
@@ -129,7 +129,7 @@ public class DebruijnGraphStaticMethods
 			System.out.println("Number of contigs generated: "+contigCount);
 		}
 		catch (Exception e) {
-			System.err.println("File not found: " + OUTPUT_FILE);
+			System.err.println("File not found: " + outputFile);
 		}
 	}
 }

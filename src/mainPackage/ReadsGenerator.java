@@ -28,7 +28,6 @@ public class ReadsGenerator
 			sequence = sequenceBuilder.toString();
 		}
 		catch (FileNotFoundException | NullPointerException e) {
-			e.printStackTrace();
 			return sequenceFile + " not found. \n\n[" + e.getMessage() + "]";
 		} catch (Exception e) {
 			e.printStackTrace();
