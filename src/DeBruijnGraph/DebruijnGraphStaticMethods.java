@@ -1,13 +1,16 @@
-package DeBruijnGraph;
+package deBruijnGraph;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
 public class DebruijnGraphStaticMethods
 {
+	private final static int fastaLineLength = 80;
+	
 	public static void constructGraph(File readsFile, int kmerSize) 
 	{
 		try (Scanner fileIn = new Scanner(readsFile)) 
@@ -54,6 +57,42 @@ public class DebruijnGraphStaticMethods
 			DeBruijnGraph.getInstance().addEdge(read.substring(i, i + kmerSize - 1), read.substring(i + 1, i + kmerSize));
 	}
 	
+	private static void printContigInFastaFormat(BufferedWriter writer, LinkedList<DirectedEdge> contigEdgeList, int contigCount, int kmerSize) 
+	{
+		int writerRemainingLineSpace, counter;
+		try {
+			writer.write(">c" + contigCount + "_EdgeCount_"+ contigEdgeList.size() +"\n");
+			writer.write(contigEdgeList.getFirst().getKmer());
+			
+			writerRemainingLineSpace = fastaLineLength - contigEdgeList.getFirst().getKmer().length();
+			
+			if (contigEdgeList.size()-1 > writerRemainingLineSpace) {
+				for(int i=1; i<=writerRemainingLineSpace; i++)
+					writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(kmerSize-2));
+				writer.newLine();
+				
+				counter=0;
+				for(int i=writerRemainingLineSpace+1; i<contigEdgeList.size(); i++)
+				{
+					writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(kmerSize-2));
+					counter++;
+					if(counter % fastaLineLength == 0)
+						writer.newLine();
+				}
+			}
+			else {
+				for(int i=1; i<contigEdgeList.size(); i++)
+					writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(kmerSize-2));
+			}
+			
+			writer.flush();
+			writer.write("\n");
+		}
+		catch (IOException e) {
+			System.err.println("DebruijnGraphStaticMethods:printContigInFastaFormat: error while writing to file");
+		}
+	}
+	
 	public static void generateContigs(String outputFile)
 	{
 		DeBruijnGraph graph;
@@ -61,7 +100,7 @@ public class DebruijnGraphStaticMethods
 		DirectedEdge unvisitedEdge;
 		BufferedWriter writer;
 		int contigCount = 0;
-		
+		boolean newContigEdgeAdded;
 		try
 		{
 			graph = DeBruijnGraph.getInstance();
@@ -71,56 +110,30 @@ public class DebruijnGraphStaticMethods
 			{
 				unvisitedEdge = graph.getZeroInDegreeUnvisitedEdge();
 				if(unvisitedEdge==null)
+				{
 					unvisitedEdge = graph.getUnvisitedEdge();
-				
-				if(unvisitedEdge==null)
-					break;
+					if(unvisitedEdge==null)
+						break;
+				}
 				else
 				{
-					DirectedEdge edge = unvisitedEdge;
-					while (edge!=null)
-					{
-						edge.setVisited(true);
-						contigEdgeList.add(edge);
-						edge = graph.getUnvisitedEdge(edge.getEnd());
-					}
-					
-					if(!contigEdgeList.isEmpty())
-					{
-						contigCount++;
-						
-						writer.write(contigEdgeList.getFirst().getKmer());
-						for(int i=1; i<contigEdgeList.size(); i++)
-							writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(graph.getKmerSize()-2));
-						
-						writer.flush();
-						writer.write("\n");
-					}
-					
-					while (!contigEdgeList.isEmpty())
-					{
-						edge = contigEdgeList.removeLast();
-						edge = graph.getUnvisitedEdge(edge.getStart());
-						if(edge!=null)
-						{
-							while (edge!=null) 
-							{
-								edge.setVisited(true);
-								contigEdgeList.add(edge);
-								edge = graph.getUnvisitedEdge(edge.getEnd());
-							}
-							
-							if(!contigEdgeList.isEmpty())
-							{
+					contigEdgeList.add(unvisitedEdge);
+					unvisitedEdge.setVisited();
+					newContigEdgeAdded = true;
+					while (!contigEdgeList.isEmpty()) {
+						unvisitedEdge = graph.getUnvisitedEdge(contigEdgeList.getLast().getEnd());
+						if (unvisitedEdge!=null) {
+							unvisitedEdge.setVisited();
+							contigEdgeList.add(unvisitedEdge);
+							newContigEdgeAdded = true;
+						}
+						else {
+							if(newContigEdgeAdded) {
 								contigCount++;
-								writer.write(">c" + contigCount + ".1_EdgeCount_"+ contigEdgeList.size() +"\n");
-								writer.write(contigEdgeList.getFirst().getKmer());
-								for(int i=1; i<contigEdgeList.size(); i++)
-									writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(graph.getKmerSize()-2));
-
-								writer.flush();
-								writer.write("\n");
+								printContigInFastaFormat(writer,contigEdgeList, contigCount, graph.getKmerSize());
+								newContigEdgeAdded = false;
 							}
+							contigEdgeList.removeLast();
 						}
 					}
 				}
@@ -128,8 +141,10 @@ public class DebruijnGraphStaticMethods
 			writer.close();
 			System.out.println("Number of contigs generated: "+contigCount);
 		}
-		catch (Exception e) {
+		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + outputFile);
+		} catch (IOException e) {
+			System.err.println("DebruijnGraphStaticMethods:generateContigs file "+outputFile+" cannot be created or opened");
 		}
 	}
 }

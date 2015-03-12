@@ -1,4 +1,4 @@
-package OverlapGraph;
+package overlapGraph;
 public class DirectedEdge {
 	private Node start, end;
 	private String suffixToPrefix;

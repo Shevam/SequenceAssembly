@@ -1,4 +1,4 @@
-package OverlapGraph;
+package overlapGraph;
 
 public class Node {
 
@@ -17,7 +17,7 @@ public class Node {
 	public void setRead(String read) { this.read = read; }
 	
 	public boolean isVisited() { return isVisited; }
-	public void setVisited(boolean visited) { this.isVisited = visited; }
+	public void setVisited() { this.isVisited = true; }
 	
 	//TODO remove indegree and outdegree if unused
 	public int getIndegree() { return this.indegree; }

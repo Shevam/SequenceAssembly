@@ -1,14 +1,14 @@
 package mainPackage;
-import java.io.File;
+import greedy.GreedyStaticMethods;
+import improvedDeBruijnGraph.ImprovedDBGStaticMethods;
+import overlapGraph.OverlapGraphStaticMethods;
+import deBruijnGraph.DebruijnGraphStaticMethods;
 
-import DeBruijnGraph.DebruijnGraphStaticMethods;
-import Hybrid.HybridStaticMethods;
-import ImprovedDeBruijnGraph.ImprovedDBGStaticMethods;
-import OverlapGraph.OverlapGraphStaticMethods;
+import java.io.File;
 
 public class Assembler 
 {
-	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, HYBRID, IMPROVED_DE_BRUIJN };
+	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, GREEDY, IMPROVED_DE_BRUIJN };
 	
 	static final String SEQUENCE_FILE = "BorreliaFull_CompleteSequence.fasta";
 	static final String READS_FILE_NAME = "generatedReads.fasta";
@@ -23,7 +23,7 @@ public class Assembler
 	
 	public static void main(String args[]) 
 	{
-		assemblyMethod = AssemblyMethods.DE_BRUIJN;
+		assemblyMethod = AssemblyMethods.OVERLAP;
 		
 		programStartTime = System.nanoTime();
 		
@@ -51,17 +51,18 @@ public class Assembler
 			contigGenerationStartTime = System.nanoTime();
 			OverlapGraphStaticMethods.generateContigs(GENERATED_CONTIGS_FILE);
 			contigGenerationEndTime = System.nanoTime();
+			System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
 			break;
 			
-		case HYBRID:
-			System.out.println("Method: Hybrid");
+		case GREEDY:
+			System.out.println("Method: Greedy");
 			graphConstructionStartTime = System.nanoTime();
-			HybridStaticMethods.constructGraph(new File(READS_FILE_NAME), MINIMUM_OVERLAP_LENGTH);
+			GreedyStaticMethods.constructGraph(new File(READS_FILE_NAME), MINIMUM_OVERLAP_LENGTH);
 			graphConstructionEndTime = System.nanoTime();
 			System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
 			
 			contigGenerationStartTime = System.nanoTime();
-			HybridStaticMethods.generateContigs(GENERATED_CONTIGS_FILE);
+			GreedyStaticMethods.generateContigs(GENERATED_CONTIGS_FILE);
 			contigGenerationEndTime = System.nanoTime();
 			System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
 			break;

@@ -1,4 +1,4 @@
-package OverlapGraph;
+package overlapGraph;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,6 +11,8 @@ import java.util.Scanner;
 
 public class OverlapGraphStaticMethods
 {
+	private final static int fastaLineLength = 80;
+	
 	public static String getOverlap(String startString, String endString, int minimumOverlapLength) {
 		int endIndex = endString.length() - 1;
 		while (endIndex >= minimumOverlapLength	&& !startString.endsWith(endString.substring(0, endIndex)))
@@ -19,23 +21,6 @@ public class OverlapGraphStaticMethods
 			return null;
 		return endString.substring(0, endIndex);
 	}
-	
-	@SuppressWarnings("unused")
-	private static String getSuperString(String startString, String endString)
-    {
-        String result = startString;
- 
-        int endIndex = endString.length() - 1;
-        while(endIndex > 0 && !startString.endsWith(endString.substring(0, endIndex)))
-            endIndex--;
- 
-        if(endIndex > 0)
-            result += endString.substring(endIndex);
-        else
-            result += endString;
- 
-        return result;
-    }
 	
 	public static void constructGraph(File readsFile, int minimumOverlapLength) 
 	{
@@ -114,22 +99,22 @@ public class OverlapGraphStaticMethods
 		return null;
     }
 	
-	private static void printContig(BufferedWriter writer, LinkedList<Node> contigNodeList, int contigCount) {
+	private static void printContigInFastaFormat(BufferedWriter writer, LinkedList<Node> contigNodeList, int contigCount) {
 		
 		try{
-			int writerRemainingLineSpace = 0, lineLength = 80;
+			int writerRemainingLineSpace = 0;
 			String contigPart;
 			
         	writer.write(">c" + contigCount + "_NodeCount_"+ contigNodeList.size() +"\n");
 			contigPart = contigNodeList.getFirst().getRead();
 			
-			for(int i=0;i<contigPart.length();i+=lineLength) {
-				if(i+lineLength > contigPart.length()) {
+			for(int i=0;i<contigPart.length();i+=fastaLineLength) {
+				if(i+fastaLineLength > contigPart.length()) {
 					writer.write(contigPart.substring(i));
-					writerRemainingLineSpace = lineLength - (contigPart.length() - i);
+					writerRemainingLineSpace = fastaLineLength - (contigPart.length() - i);
 				}
 				else
-					writer.write(contigPart.substring(i, i+lineLength) + "\n");
+					writer.write(contigPart.substring(i, i+fastaLineLength) + "\n");
 			}
 			
 			for(int j=1; j<contigNodeList.size(); j++)
@@ -138,13 +123,13 @@ public class OverlapGraphStaticMethods
 				
 				if(contigPart.length() > writerRemainingLineSpace) {
 					writer.write(contigPart.substring(0, writerRemainingLineSpace) + "\n");
-					for(int i=writerRemainingLineSpace;i<contigPart.length();i+=lineLength) {
-						if(contigPart.length() < i+lineLength) {
+					for(int i=writerRemainingLineSpace;i<contigPart.length();i+=fastaLineLength) {
+						if(contigPart.length() < i+fastaLineLength) {
 							writer.write(contigPart.substring(i));
-							writerRemainingLineSpace = lineLength - (contigPart.length() - i);
+							writerRemainingLineSpace = fastaLineLength - (contigPart.length() - i);
 						}
 						else
-							writer.write(contigPart.substring(i, i+lineLength) + "\n");
+							writer.write(contigPart.substring(i, i+fastaLineLength) + "\n");
 					}
 				}
 				else {
@@ -156,7 +141,7 @@ public class OverlapGraphStaticMethods
 			writer.newLine();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("OverlapGraphStaticMethods:printContigInFastaFormat: error while writing to file");
 		}
 	}
 	
@@ -179,16 +164,17 @@ public class OverlapGraphStaticMethods
 		    contigCount = 0;
 		    
 			nodeList.add(startingNode);
+			startingNode.setVisited();
 			while(!nodeList.isEmpty()) {
 				aNode = getUnvisitedNeighbour(nodeList.getLast());
 				
 				if(aNode == null) {
 					contigCount++;
-					printContig(writer, (LinkedList<Node>) nodeList.clone(), contigCount);
+					printContigInFastaFormat(writer, (LinkedList<Node>) nodeList.clone(), contigCount);
 					nodeList.removeLast();
 				}
 				else {
-					aNode.setVisited(true);
+					aNode.setVisited();
 					nodeList.add(aNode);
 				}
 			}
@@ -200,7 +186,7 @@ public class OverlapGraphStaticMethods
 			System.err.println("File not found: " + outputFile);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("OverlapGraphStaticMethods:generateContigs file "+outputFile+" cannot be created or opened");
 		}
     }
 }

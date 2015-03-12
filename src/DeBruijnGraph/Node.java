@@ -1,4 +1,4 @@
-package DeBruijnGraph;
+package deBruijnGraph;
 
 public class Node {
 

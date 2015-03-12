@@ -1,4 +1,4 @@
-package Hybrid;
+package greedy;
 
 public class Node {
 

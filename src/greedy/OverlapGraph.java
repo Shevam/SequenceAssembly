@@ -1,4 +1,5 @@
-package Hybrid;
+package greedy;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -43,13 +44,13 @@ public class OverlapGraph {
 		String overlap;
 		if(node.getRead().contains(newNode.getRead().substring(0, minimumOverlapLength-1)))
 		{
-			overlap = HybridStaticMethods.getOverlap(node.getRead(), newNode.getRead(), minimumOverlapLength);
+			overlap = GreedyStaticMethods.getOverlap(node.getRead(), newNode.getRead(), minimumOverlapLength);
 			if(overlap != null)
 				addEdge(node, newNode, overlap);
 		}
 		if(newNode.getRead().contains(node.getRead().substring(0, minimumOverlapLength-1)))
 		{
-			overlap = HybridStaticMethods.getOverlap(newNode.getRead(), node.getRead(), minimumOverlapLength);
+			overlap = GreedyStaticMethods.getOverlap(newNode.getRead(), node.getRead(), minimumOverlapLength);
 			if(overlap != null)
 				addEdge(newNode, node, overlap);
 		}

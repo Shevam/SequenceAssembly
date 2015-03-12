@@ -1,4 +1,5 @@
-package DeBruijnGraph;
+package deBruijnGraph;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -47,17 +48,15 @@ public class DeBruijnGraph {
 			adjacencyList.put(prefixString, new LinkedList<DirectedEdge>());
 			edgeList = adjacencyList.get(prefixString);
 		}
-		
-		/*
-		 * allowing duplicate edges
-		
 		else {
 			for (DirectedEdge edge : edgeList) {
-				if(edge.getEnd()==suffixNode)
+				if(edge.getEnd()==suffixNode){
+					edge.incrementWeight();
 					return edge;
+				}
 			}
 		}
-		*/
+		
 		newEdge = new DirectedEdge(prefixNode, suffixNode);
 		edgeList.add(newEdge);
 		prefixNode.incrementOutdegree();
