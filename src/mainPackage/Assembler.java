@@ -23,7 +23,7 @@ public class Assembler
 	
 	public static void main(String args[]) 
 	{
-		assemblyMethod = AssemblyMethods.OVERLAP;
+		assemblyMethod = AssemblyMethods.GREEDY;
 		
 		programStartTime = System.nanoTime();
 		
