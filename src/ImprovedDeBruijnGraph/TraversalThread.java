@@ -1,98 +1,54 @@
-package ImprovedDeBruijnGraph;
+package improvedDeBruijnGraph;
 import java.util.LinkedList;
 
 public class TraversalThread extends Thread
 {
-	DirectedEdge edge;
+	DirectedEdge startingEdge;
 	LinkedList<DirectedEdge> contigEdgeList;
 	WriterThread writerThread;
 	public TraversalThread(DirectedEdge unvisitedEdge)
 	{
-		edge=unvisitedEdge;
+		startingEdge=unvisitedEdge;
 		contigEdgeList = new LinkedList<DirectedEdge>();
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void run() 
 	{
+		Node endNode, lockedEndNode;
+		DirectedEdge unvisitedEdge;
+		boolean newContigEdgeAdded;
 		super.run();
-		Node aNode, lockedNode;
 		
-		try
-		{
-			contigEdgeList.add(edge);			
-			aNode = edge.getEnd();
+		contigEdgeList.add(startingEdge);
+		startingEdge.setVisited();
+		
+		newContigEdgeAdded = true;
+		while (!contigEdgeList.isEmpty()) {
+			unvisitedEdge = contigEdgeList.getLast();
 			
+			endNode = unvisitedEdge.getEnd();
 			do
-				lockedNode = aNode.fetchNode();
-			while(lockedNode == null);
-
-			edge = lockedNode.getNextUnvisitedEdge();
-			lockedNode.releaseNode();
+				lockedEndNode = endNode.fetchNode();
+			while(lockedEndNode == null);
+			unvisitedEdge = lockedEndNode.getNextUnvisitedEdge();
+			lockedEndNode.releaseNode();
 			
-			while (edge!=null)
-			{
-				edge.setVisited(true);
-				contigEdgeList.add(edge);
-				
-				aNode = edge.getEnd();
-				do
-					lockedNode = aNode.fetchNode();
-				while(lockedNode == null);
-				edge = lockedNode.getNextUnvisitedEdge();
-				lockedNode.releaseNode();
+			if (unvisitedEdge!=null) {
+				unvisitedEdge.setVisited();
+				contigEdgeList.add(unvisitedEdge);
+				newContigEdgeAdded = true;
 			}
-			
-			if(!contigEdgeList.isEmpty() && contigEdgeList != null)
-			{
-				do
-					writerThread = WriterThread.getInstance();
-				while(writerThread == null);
-				
-				writerThread.printContig((LinkedList<DirectedEdge>) contigEdgeList.clone());
-			}
-			
-			while (!contigEdgeList.isEmpty())
-			{
-				edge = contigEdgeList.removeLast();
-				
-				aNode = edge.getStart();
-				do
-					lockedNode = aNode.fetchNode();
-				while(lockedNode == null);
-				
-				edge = lockedNode.getNextUnvisitedEdge();
-				lockedNode.releaseNode();
-				
-				if(edge!=null)
-				{
-					while (edge!=null)
-					{
-						edge.setVisited(true);
-						contigEdgeList.add(edge);
-
-						aNode = edge.getEnd();
-						do
-							lockedNode = aNode.fetchNode();
-						while(lockedNode == null);
-						edge = lockedNode.getNextUnvisitedEdge();
-						lockedNode.releaseNode();
-					}
-					
-					if(!contigEdgeList.isEmpty() && contigEdgeList != null)
-					{
-						do
-							writerThread = WriterThread.getInstance();
-						while(writerThread == null);
-						
-						writerThread.printContig((LinkedList<DirectedEdge>) contigEdgeList.clone());
-					}
+			else {
+				if(newContigEdgeAdded) {
+					do
+						writerThread = WriterThread.getInstance();
+					while(writerThread == null);
+					writerThread.addContigToWriterBuffer((LinkedList<DirectedEdge>) contigEdgeList.clone());
+					newContigEdgeAdded = false;
 				}
+				contigEdgeList.removeLast();
 			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
-
 }

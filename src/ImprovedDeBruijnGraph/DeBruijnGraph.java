@@ -1,4 +1,4 @@
-package ImprovedDeBruijnGraph;
+package improvedDeBruijnGraph;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;

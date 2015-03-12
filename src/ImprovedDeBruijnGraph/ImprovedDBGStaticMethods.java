@@ -1,8 +1,9 @@
-package ImprovedDeBruijnGraph;
+package improvedDeBruijnGraph;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,7 +23,6 @@ public class ImprovedDBGStaticMethods
 			DeBruijnGraph.getInstance().setKmerSize(kmerSize);
 			System.out.println("kmer size: " + DeBruijnGraph.getInstance().getKmerSize());
 			
-			//TODO implement DEPTH FIRST SEARCH(DFS) 19. GraphAlgos
 			while (fileIn.hasNextLine())
 			{
 				currentLine = fileIn.nextLine();
@@ -56,7 +56,7 @@ public class ImprovedDBGStaticMethods
 		for (int i = 0; i < read.length() - kmerSize + 1; i++)
 			DeBruijnGraph.getInstance().addEdge(read.substring(i, i + kmerSize - 1), read.substring(i + 1, i + kmerSize));
 	}
-
+	
 	public static void generateContigs(String generatedContigsFile)
 	{
 		DirectedEdge unvisitedEdge;
@@ -64,8 +64,7 @@ public class ImprovedDBGStaticMethods
 		TraversalThread traversalThread;
 		ExecutorService es;
 		boolean finished;
-		DeBruijnGraph g;
-		
+		DeBruijnGraph graph;
 		try
 		{
 			writer = new BufferedWriter(new FileWriter(new File(generatedContigsFile)));
@@ -74,45 +73,53 @@ public class ImprovedDBGStaticMethods
 			es = Executors.newFixedThreadPool(8);
 			while (true)
 			{
-				g = DeBruijnGraph.getInstance();
-				while(g==null)
-					g = DeBruijnGraph.getInstance();
+				do
+					graph = DeBruijnGraph.getInstance();
+				while(graph==null);
 				
-				unvisitedEdge = g.getZeroInDegreeUnvisitedEdge();
-				
+				unvisitedEdge = graph.getZeroInDegreeUnvisitedEdge();
 				if(unvisitedEdge==null)
 					break;
 				
-				unvisitedEdge.setVisited(true);
 				es.execute(traversalThread = new TraversalThread(unvisitedEdge));
 			}
 			es.shutdown();
-			finished = es.awaitTermination(30, TimeUnit.MINUTES);
 			
-			if(!finished)
-				System.out.println("timeout elapsed before thread termination!!");
+			try {
+				finished = es.awaitTermination(30, TimeUnit.MINUTES);
+				if(!finished)
+					System.err.println("ImprovedDBGStaticMethods:generateContigs: a traversal thread's timeout elapsed before finishing execution");
+			} catch (InterruptedException e) {
+				System.err.println("ImprovedDBGStaticMethods:generateContigs: thread executer interrupted while waiting termination of traversal thread");
+			}
 			
-			g = DeBruijnGraph.getInstance();
-			while(g==null)
-				g = DeBruijnGraph.getInstance();
+			do
+				graph = DeBruijnGraph.getInstance();
+			while(graph==null);
 			
-			unvisitedEdge = g.getUnvisitedEdge();
+			unvisitedEdge = graph.getUnvisitedEdge();
 			while(unvisitedEdge!=null)
 			{
 				traversalThread = new TraversalThread(unvisitedEdge);
-				traversalThread.start();
-				traversalThread.join();
 				
-				g = DeBruijnGraph.getInstance();
-				while(g==null)
-					g = DeBruijnGraph.getInstance();
+				try {
+					traversalThread.start();
+					traversalThread.join();
+				} catch (IllegalThreadStateException e) {
+					System.err.println("ImprovedDBGStaticMethods:generateContigs: traversal thread was already started");
+				} catch (InterruptedException e) {
+					System.err.println("ImprovedDBGStaticMethods:generateContigs: traversal thread join interrupted by another thread");
+				}
 				
-				unvisitedEdge = g.getUnvisitedEdge();
+				do
+					graph = DeBruijnGraph.getInstance();
+				while(graph==null);
+				unvisitedEdge = graph.getUnvisitedEdge();
 			}
+			System.out.println("Number of contigs generated: " + WriterThread.getInstance().getContigCount());
 			writer.close();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("ImprovedDBGStaticMethods:generateContigs: file "+generatedContigsFile+" cannot be created or opened");
 		}
 	}
 }
