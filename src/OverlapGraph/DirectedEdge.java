@@ -5,8 +5,6 @@ public class DirectedEdge {
 	private int overlapLength;
 	
 	public DirectedEdge(Node start, Node end, String suffixToPrefix) {
-		start.incrementOutdegree();
-		end.incrementIndegree();
 		this.start = start;
 		this.end = end;
 		this.suffixToPrefix = suffixToPrefix;

@@ -8,7 +8,7 @@ import java.io.File;
 
 public class Assembler 
 {
-	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, GREEDY, IMPROVED_DE_BRUIJN };
+	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, GREEDY, IMPROVED_DE_BRUIJN, none };
 	
 	static final String SEQUENCE_FILE = "BorreliaFull_CompleteSequence.fasta";
 	static final String READS_FILE_NAME = "generatedReads.fasta";
@@ -23,8 +23,10 @@ public class Assembler
 	
 	public static void main(String args[]) 
 	{
-		assemblyMethod = AssemblyMethods.GREEDY;
+		//new ReadsGenerator();
+		//ReadsGenerator.generateReads(SEQUENCE_FILE, 250, MINIMUM_OVERLAP_LENGTH, READS_FILE_NAME);
 		
+		assemblyMethod = AssemblyMethods.DE_BRUIJN;
 		programStartTime = System.nanoTime();
 		
 		switch (assemblyMethod) {

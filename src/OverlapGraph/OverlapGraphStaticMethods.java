@@ -159,23 +159,30 @@ public class OverlapGraphStaticMethods
 			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
 			nodeList = new LinkedList<Node>();
 			adjacencyList = OverlapGraph.getInstance().getAdjacencyList();
+			contigCount = 0;
 			i = adjacencyList.keySet().iterator();
-			startingNode = i.next();
-		    contigCount = 0;
-		    
-			nodeList.add(startingNode);
-			startingNode.setVisited();
-			while(!nodeList.isEmpty()) {
-				aNode = getUnvisitedNeighbour(nodeList.getLast());
-				
-				if(aNode == null) {
-					contigCount++;
-					printContigInFastaFormat(writer, (LinkedList<Node>) nodeList.clone(), contigCount);
-					nodeList.removeLast();
-				}
-				else {
-					aNode.setVisited();
-					nodeList.add(aNode);
+			
+			while (i.hasNext())
+			{
+				startingNode = i.next();
+			    
+			    if (!startingNode.isVisited())
+			    {
+			    	nodeList.add(startingNode);
+					startingNode.setVisited();
+					while(!nodeList.isEmpty()) {
+						aNode = getUnvisitedNeighbour(nodeList.getLast());
+						
+						if(aNode == null) {
+							contigCount++;
+							printContigInFastaFormat(writer, (LinkedList<Node>) nodeList.clone(), contigCount);
+							nodeList.removeLast();
+						}
+						else {
+							aNode.setVisited();
+							nodeList.add(aNode);
+						}
+					}
 				}
 			}
 			
