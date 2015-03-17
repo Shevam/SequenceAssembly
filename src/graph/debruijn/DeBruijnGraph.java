@@ -71,40 +71,6 @@ public class DeBruijnGraph implements GraphInterface {
 	public int getK() { return this.k; }
 	public void setK(int value) { this.k = value; }
 	
-	public void displayNodes() {
-		System.out.println("Nodes (indeg, outdeg): ");
-		for (Node node : nodeList.values()) {
-			System.out.println(node.getKm1mer() + " (" + node.getIndegree() + ", " + node.getOutdegree() + ")");
-		}
-		System.out.println();
-	}
-	
-	public void displayEdges() {
-		System.out.println("Edges: ");
-		for (String node : nodeList.keySet()) {
-			if (adjacencyList.get(node) != null) {
-				for (DirectedEdge edge : adjacencyList.get(node)) {
-					edge.print();
-				}
-			}
-		}
-		System.out.println();
-	}
-	
-	public void displayGraph() {
-		System.out.println("Graph adjacency List:");
-		for (String node : nodeList.keySet()) {
-			System.out.print(node + " --> ");
-			if (adjacencyList.get(node) != null) {
-				for (DirectedEdge edge : adjacencyList.get(node)) {
-					System.out.print(edge.getEnd().getKm1mer() + ", ");
-				}
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-	
 	public DirectedEdge getUnvisitedEdge() {
 		for (String nodeValue : nodeList.keySet()) {
 			if (adjacencyList.get(nodeValue) != null) {
@@ -127,7 +93,7 @@ public class DeBruijnGraph implements GraphInterface {
 		return null;
 	}
 
-	public DirectedEdge getZeroInDegreeUnvisitedEdge() { // TODO: should find only zero-indegree node?
+	public DirectedEdge getZeroInDegreeUnvisitedEdge() {
 		for (String nodeValue : nodeList.keySet()) {
 			if (adjacencyList.get(nodeValue) != null) {
 				for (DirectedEdge edge : adjacencyList.get(nodeValue)) {
@@ -217,7 +183,7 @@ public class DeBruijnGraph implements GraphInterface {
 			writer.write("\n");
 		}
 		catch (IOException e) {
-			System.err.println("DebruijnGraphStaticMethods:printContigInFastaFormat: error while writing to file");
+			System.err.println("DebruijnGraph:printContigInFastaFormat: error while writing to file");
 		}
 	}
 
@@ -270,8 +236,41 @@ public class DeBruijnGraph implements GraphInterface {
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + outputFile);
 		} catch (IOException e) {
-			System.err.println("DebruijnGraphStaticMethods:generateContigs file "+outputFile+" cannot be created or opened");
+			System.err.println("DebruijnGraph:generateContigs file "+outputFile+" cannot be created or opened");
 		}
 	}
-
+	
+	public void displayNodes() {
+		System.out.println("Nodes (indeg, outdeg): ");
+		for (Node node : nodeList.values()) {
+			System.out.println(node.getKm1mer() + " (" + node.getIndegree() + ", " + node.getOutdegree() + ")");
+		}
+		System.out.println();
+	}
+	
+	public void displayEdges() {
+		System.out.println("Edges: ");
+		for (String node : nodeList.keySet()) {
+			if (adjacencyList.get(node) != null) {
+				for (DirectedEdge edge : adjacencyList.get(node)) {
+					edge.print();
+				}
+			}
+		}
+		System.out.println();
+	}
+	
+	public void displayGraph() {
+		System.out.println("Graph adjacency List:");
+		for (String node : nodeList.keySet()) {
+			System.out.print(node + " --> ");
+			if (adjacencyList.get(node) != null) {
+				for (DirectedEdge edge : adjacencyList.get(node)) {
+					System.out.print(edge.getEnd().getKm1mer() + ", ");
+				}
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
 }

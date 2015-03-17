@@ -138,9 +138,6 @@ public class GreedyOverlapGraph implements GraphInterface {
 		return 0;
 	}
 	
-	
-	
-	
 	public String getOverlap(String startString, String endString, int minimumOverlapLength) {
 		int endIndex = endString.length() - 1;
 		while (endIndex >= minimumOverlapLength	&& !startString.endsWith(endString.substring(0, endIndex)))
@@ -244,7 +241,7 @@ public class GreedyOverlapGraph implements GraphInterface {
 			writer.newLine();
 		}
 		catch (IOException e) {
-			System.err.println("GreedyStaticMethods:printContigInFastaFormat: error while writing to file");
+			System.err.println("GreedyOverlapGraph:printContigInFastaFormat: error while writing to file");
 		}
 	}
 
@@ -281,7 +278,7 @@ public class GreedyOverlapGraph implements GraphInterface {
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + outputFile);
 		} catch (IOException e) {
-			System.err.println("GreedyStaticMethods:generateContigs file "+outputFile+" cannot be created or opened");
+			System.err.println("GreedyOverlapGraph:generateContigs file "+outputFile+" cannot be created or opened");
 		}
     }
 }
