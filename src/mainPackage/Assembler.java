@@ -1,11 +1,10 @@
 package mainPackage;
 
-import java.io.File;
-
 import graph.debruijn.DeBruijnGraph;
 import graph.debruijn.improved.ImprovedDBG;
-import graph.greedy.GreedyOverlapGraph;
 import graph.overlap.OverlapGraph;
+
+import java.io.File;
 
 public class Assembler 
 {
@@ -24,7 +23,8 @@ public class Assembler
 	
 	public static void main(String args[]) 
 	{
-		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.GREEDY };//, AssemblyMethods.OVERLAP, AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
+//		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.GREEDY };//, AssemblyMethods.OVERLAP, AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
+		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.IMPROVED_DE_BRUIJN };
 		
 		programStartTime = System.nanoTime();
 		

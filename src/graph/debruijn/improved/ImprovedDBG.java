@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -16,12 +18,12 @@ import java.util.concurrent.TimeUnit;
 import mainPackage.GraphInterface;
 
 public class ImprovedDBG implements GraphInterface {
-	LinkedHashMap<String, Node> nodeList;
+	ConcurrentHashMap<String, Node> nodeList;
 	int kmerSize;
 	
 	public ImprovedDBG() {
 		super();
-		nodeList = new LinkedHashMap<String, Node>();
+		nodeList = new ConcurrentHashMap<String, Node>();
 	}
 	
 	public Node addNode(String km1mer) {
@@ -80,22 +82,34 @@ public class ImprovedDBG implements GraphInterface {
 	}
 	
 	public DirectedEdge getUnvisitedEdge() {
-		for (Node node : nodeList.values()) {
-			if (node.edgeList.peek()!=null && node.edgeList.peek().getWeight() > 0) {
-				return node.edgeList.peek();
-			}
-		}
+        Iterator<Entry<String, Node>> iter = nodeList.entrySet().iterator();
+        Entry<String, Node> entry;
+        DirectedEdge edge;
+        while(iter.hasNext())
+        {
+            entry = iter.next();
+            edge = entry.getValue().getUnvisitedEdge();
+            if (edge != null) {
+            	return edge;
+            }
+        }
 		return null;
 	}
 
 	public DirectedEdge getUnvisitedEdgeFromZeroIndegreeNode() {
-		for (Node node : nodeList.values()) {
-			for (DirectedEdge e : node.edgeList) {
-				if ((e.getStart().getIndegree() == 0) && (e.getWeight()>0)) {
-					return e;
-				}
-			}
-		}
+		Iterator<Entry<String, Node>> iter = nodeList.entrySet().iterator();
+        Node node;
+        DirectedEdge edge;
+        while(iter.hasNext())
+        {
+            node = iter.next().getValue();
+            if (node.getIndegree() == 0) {
+            	edge = node.getUnvisitedEdge();
+            	if (edge != null) {
+            		return edge;
+            	}
+            }
+        }
 		return null;
 	}
 	    
@@ -171,11 +185,11 @@ public class ImprovedDBG implements GraphInterface {
 		TraversalThread traversalThread;
 		ExecutorService es;
 		boolean finished;
-		BlockingQueue<LinkedList<DirectedEdge>> q = new LinkedBlockingQueue<LinkedList<DirectedEdge>>();
+		BlockingQueue<LinkedList<DirectedEdge>> queue = new LinkedBlockingQueue<LinkedList<DirectedEdge>>();
 		try
 		{
 			writer = new BufferedWriter(new FileWriter(new File(generatedContigsFile)));
-			new WriterThread(writer, this.getKmerSize(), q);
+			new WriterThread(writer, this.getKmerSize(), queue);
 			
 			es = Executors.newFixedThreadPool(8);
 			while (true)
@@ -184,7 +198,7 @@ public class ImprovedDBG implements GraphInterface {
 				if(unvisitedEdge==null)
 					break;
 				
-				es.execute(traversalThread = new TraversalThread(unvisitedEdge, q));
+				es.execute(traversalThread = new TraversalThread(unvisitedEdge, queue));
 			}
 			es.shutdown();
 			
@@ -199,7 +213,7 @@ public class ImprovedDBG implements GraphInterface {
 			unvisitedEdge = this.getUnvisitedEdge();
 			while(unvisitedEdge!=null)
 			{
-				traversalThread = new TraversalThread(unvisitedEdge, q);
+				traversalThread = new TraversalThread(unvisitedEdge, queue);
 				
 				try {
 					traversalThread.start();

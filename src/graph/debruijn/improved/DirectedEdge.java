@@ -31,9 +31,9 @@ public class DirectedEdge {
 	
 	public void setVisited() {
 		decrementWeight();
-		if (weight == 0) {
-			this.getStart().removeEdge(this);
-		}
+//		if (weight == 0) {
+//			this.getStart().removeEdge(this);
+//		}
 	}
 	
 	public void print() { System.out.println(start.getKm1mer() + " >>" + kmer + ">> " + end.getKm1mer()); }
