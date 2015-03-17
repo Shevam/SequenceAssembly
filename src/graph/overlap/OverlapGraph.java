@@ -77,17 +77,11 @@ public class OverlapGraph implements GraphInterface {
         return newEdge;
 	}
 	
-	public LinkedHashMap<String, Node> getNodeList() {
-		return nodeList;
-	}
+	public LinkedHashMap<String, Node> getNodeList() { return nodeList;	}
 	
-	public LinkedList<DirectedEdge> getAdjacencyList(Node aNode) {
-		return adjacencyList.get(aNode);
-	}
+	public LinkedList<DirectedEdge> getAdjacencyList(Node aNode) { return adjacencyList.get(aNode);	}
 	
-	public HashMap<Node, LinkedList<DirectedEdge>> getAdjacencyList() {
-		return adjacencyList;
-	}
+	public HashMap<Node, LinkedList<DirectedEdge>> getAdjacencyList() {	return adjacencyList; }
 	
 	public int getOverlapLength(Node node1, Node node2) {
 		for (DirectedEdge edge : adjacencyList.get(node1)) {
@@ -96,10 +90,6 @@ public class OverlapGraph implements GraphInterface {
 		}
 		return 0;
 	}
-	
-	
-	
-	
 	
 	public String getOverlap(String startString, String endString, int minimumOverlapLength) {
 		int endIndex = endString.length() - 1;
@@ -229,10 +219,11 @@ public class OverlapGraph implements GraphInterface {
 			writer.newLine();
 		}
 		catch (IOException e) {
-			System.err.println("OverlapGraphStaticMethods:printContigInFastaFormat: error while writing to file");
+			System.err.println("OverlapGraph:printContigInFastaFormat: error while writing to file");
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void generateContigs(String outputFile) 
     {
 		HashMap<Node, LinkedList<DirectedEdge>> adjacencyList;
@@ -277,7 +268,7 @@ public class OverlapGraph implements GraphInterface {
 			System.err.println("File not found: " + outputFile);
 		}
 		catch (IOException e) {
-			System.err.println("OverlapGraphStaticMethods:generateContigs file "+outputFile+" cannot be created or opened");
+			System.err.println("OverlapGraph:generateContigs file "+outputFile+" cannot be created or opened");
 		}
     }
 }

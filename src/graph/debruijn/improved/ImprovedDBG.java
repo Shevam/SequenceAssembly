@@ -100,7 +100,8 @@ public class ImprovedDBG implements GraphInterface {
 	}
 	    
     public boolean isEulerian() {
-    	int nbal = 0, nsemi = 0, nneither = 0;
+    	@SuppressWarnings("unused")
+		int nbal = 0, nsemi = 0, nneither = 0;
     	for (Node node : nodeList.values()) {
     		if (node.isBalanced())
     			nbal++;
@@ -115,9 +116,6 @@ public class ImprovedDBG implements GraphInterface {
     		return true;
     	return false;
     }
-    
-    
-    
     
 	public void constructGraph(File readsFile, int kmerSize) 
 	{
@@ -191,9 +189,9 @@ public class ImprovedDBG implements GraphInterface {
 			try {
 				finished = es.awaitTermination(30, TimeUnit.MINUTES);
 				if(!finished)
-					System.err.println("ImprovedDBGStaticMethods:generateContigs: a traversal thread's timeout elapsed before finishing execution");
+					System.err.println("ImprovedDBG:generateContigs: a traversal thread's timeout elapsed before finishing execution");
 			} catch (InterruptedException e) {
-				System.err.println("ImprovedDBGStaticMethods:generateContigs: thread executer interrupted while waiting termination of traversal thread");
+				System.err.println("ImprovedDBG:generateContigs: thread executer interrupted while waiting termination of traversal thread");
 			}
 			
 			unvisitedEdge = this.getUnvisitedEdge();
@@ -205,9 +203,9 @@ public class ImprovedDBG implements GraphInterface {
 					traversalThread.start();
 					traversalThread.join();
 				} catch (IllegalThreadStateException e) {
-					System.err.println("ImprovedDBGStaticMethods:generateContigs: traversal thread was already started");
+					System.err.println("ImprovedDBG:generateContigs: traversal thread was already started");
 				} catch (InterruptedException e) {
-					System.err.println("ImprovedDBGStaticMethods:generateContigs: traversal thread join interrupted by another thread");
+					System.err.println("ImprovedDBG:generateContigs: traversal thread join interrupted by another thread");
 				}
 				
 				unvisitedEdge = this.getUnvisitedEdge();
@@ -215,7 +213,7 @@ public class ImprovedDBG implements GraphInterface {
 			System.out.println("Number of contigs generated: " + WriterThread.getInstance().getContigCount());
 			writer.close();
 		} catch (IOException e) {
-			System.err.println("ImprovedDBGStaticMethods:generateContigs: file "+generatedContigsFile+" cannot be created or opened");
+			System.err.println("ImprovedDBG:generateContigs: file "+generatedContigsFile+" cannot be created or opened");
 		}
 	}
 }
