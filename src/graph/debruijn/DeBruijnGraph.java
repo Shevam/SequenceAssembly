@@ -1,38 +1,33 @@
 package graph.debruijn;
 
+import interfaces.IGraph;
+
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Scanner;
 
-import mainPackage.GraphInterface;
-
-public class DeBruijnGraph implements GraphInterface {
+public abstract class DeBruijnGraph implements IGraph {
 	LinkedHashMap<String, Node> nodeList;
 	HashMap<String, LinkedList<DirectedEdge>> adjacencyList;
 	int k;
-	int fastaLineLength = 80;
 	
-	public DeBruijnGraph() {
-		super();
+	protected DeBruijnGraph() {
 		nodeList = new LinkedHashMap<String, Node>();
 		adjacencyList = new HashMap<String, LinkedList<DirectedEdge>>();
 	}
 	
-	public Node addNode(String km1mer) {
+	protected Node addNode(String km1mer) {
 		if (nodeList.containsKey(km1mer))
 			return nodeList.get(km1mer);
 		Node newNode = new Node(km1mer);
 		nodeList.put(km1mer, newNode);
 		return newNode;
 	}
-
-	public DirectedEdge addEdge(String prefixString, String suffixString) {
+	
+	protected DirectedEdge addEdge(String prefixString, String suffixString) {
 		Node prefixNode, suffixNode;
 		DirectedEdge newEdge;
 		LinkedList<DirectedEdge> edgeList;
@@ -68,10 +63,10 @@ public class DeBruijnGraph implements GraphInterface {
 		return newEdge;
 	}
 	
-	public int getK() { return this.k; }
-	public void setK(int value) { this.k = value; }
+	protected int getK() { return this.k; }
+	protected void setK(int value) { this.k = value; }
 	
-	public DirectedEdge getUnvisitedEdge() {
+	protected DirectedEdge getUnvisitedEdge() {
 		for (String nodeValue : nodeList.keySet()) {
 			if (adjacencyList.get(nodeValue) != null) {
 				for (DirectedEdge edge : adjacencyList.get(nodeValue)) {
@@ -83,7 +78,7 @@ public class DeBruijnGraph implements GraphInterface {
 		return null;
 	}
 	
-	public synchronized DirectedEdge getUnvisitedEdge(Node currentNode) {
+	protected synchronized DirectedEdge getUnvisitedEdge(Node currentNode) {
 		if (adjacencyList.get(currentNode.getKm1mer()) != null) {
 			for (DirectedEdge edge : adjacencyList.get(currentNode.getKm1mer())) {
 				if (!edge.isVisited())
@@ -93,7 +88,7 @@ public class DeBruijnGraph implements GraphInterface {
 		return null;
 	}
 
-	public DirectedEdge getZeroInDegreeUnvisitedEdge() {
+	protected DirectedEdge getZeroInDegreeUnvisitedEdge() {
 		for (String nodeValue : nodeList.keySet()) {
 			if (adjacencyList.get(nodeValue) != null) {
 				for (DirectedEdge edge : adjacencyList.get(nodeValue)) {
@@ -105,53 +100,14 @@ public class DeBruijnGraph implements GraphInterface {
 		return null;
 	}
 	
-	public void constructGraph(File readsFile, int kmerSize) 
-	{
-		try (Scanner fileIn = new Scanner(readsFile)) 
-		{
-			String currentLine = "";
-			StringBuilder read = new StringBuilder();
-			int readCount = 0;
-			
-			new DeBruijnGraph();
-			this.setK(kmerSize);
-			System.out.println("kmer size: " + this.getK());
-			
-			while (fileIn.hasNextLine())
-			{
-				currentLine = fileIn.nextLine();
-				
-				if (currentLine.startsWith(">")) {
-					if (!read.toString().equals("")) {
-						breakReadIntoKmersAndAddToGraph(read.toString().toUpperCase());
-						readCount++;
-					}
-					read = new StringBuilder();
-				} 
-				else
-					read.append(currentLine.trim());
-			}
-			
-			if (!read.toString().equals("")) {
-				breakReadIntoKmersAndAddToGraph(read.toString().toUpperCase());
-				readCount++;
-			}
-			
-			System.out.println("Number of reads processed: " + readCount);
-		}
-		catch (FileNotFoundException e) {
-			System.err.println("File not found: " + readsFile);
-		}
-	}
-
-	public void breakReadIntoKmersAndAddToGraph(String read) 
+	protected void breakReadIntoKmersAndAddToGraph(String read) 
 	{
 		int kmerSize = this.getK();
 		for (int i = 0; i < read.length() - kmerSize + 1; i++)
 			this.addEdge(read.substring(i, i + kmerSize - 1), read.substring(i + 1, i + kmerSize));
 	}
 
-	public void printContigInFastaFormat(BufferedWriter writer, LinkedList<DirectedEdge> contigEdgeList, int contigCount, int kmerSize) 
+	protected void printContigInFastaFormat(BufferedWriter writer, LinkedList<DirectedEdge> contigEdgeList, int contigCount, int kmerSize) 
 	{
 		int writerRemainingLineSpace, counter;
 		try {
@@ -187,58 +143,7 @@ public class DeBruijnGraph implements GraphInterface {
 		}
 	}
 
-	public void generateContigs(String outputFile)
-	{
-		LinkedList<DirectedEdge> contigEdgeList = new LinkedList<DirectedEdge>();
-		DirectedEdge unvisitedEdge;
-		BufferedWriter writer;
-		int contigCount = 0;
-		boolean newContigEdgeAdded;
-		try
-		{
-			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-			
-			while (true)
-			{
-				unvisitedEdge = this.getZeroInDegreeUnvisitedEdge();
-				if(unvisitedEdge==null)
-				{
-					unvisitedEdge = this.getUnvisitedEdge();
-					if(unvisitedEdge==null)
-						break;
-				}
-				else
-				{
-					contigEdgeList.add(unvisitedEdge);
-					unvisitedEdge.setVisited();
-					newContigEdgeAdded = true;
-					while (!contigEdgeList.isEmpty()) {
-						unvisitedEdge = this.getUnvisitedEdge(contigEdgeList.getLast().getEnd());
-						if (unvisitedEdge!=null) {
-							unvisitedEdge.setVisited();
-							contigEdgeList.add(unvisitedEdge);
-							newContigEdgeAdded = true;
-						}
-						else {
-							if(newContigEdgeAdded) {
-								contigCount++;
-								printContigInFastaFormat(writer,contigEdgeList, contigCount, this.getK());
-								newContigEdgeAdded = false;
-							}
-							contigEdgeList.removeLast();
-						}
-					}
-				}
-			}
-			writer.close();
-			System.out.println("Number of contigs generated: "+contigCount);
-		}
-		catch (FileNotFoundException e) {
-			System.err.println("File not found: " + outputFile);
-		} catch (IOException e) {
-			System.err.println("DebruijnGraph:generateContigs file "+outputFile+" cannot be created or opened");
-		}
-	}
+	
 	
 	public void displayNodes() {
 		System.out.println("Nodes (indeg, outdeg): ");
@@ -273,4 +178,7 @@ public class DeBruijnGraph implements GraphInterface {
 		}
 		System.out.println();
 	}
+	
+	public abstract void constructGraph(File readsFile, int kmerSize);
+	public abstract void generateContigs(String outputFile);
 }

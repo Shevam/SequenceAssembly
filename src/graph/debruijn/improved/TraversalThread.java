@@ -16,6 +16,7 @@ public class TraversalThread extends Thread
 		queue = q;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void run() 
 	{
 		super.run();
@@ -41,7 +42,7 @@ public class TraversalThread extends Thread
 			else {
 				if(edgeAdded) {
 					try {
-						queue.put(new LinkedList<DirectedEdge>(path));
+						queue.put((LinkedList<DirectedEdge>) path.clone());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

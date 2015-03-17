@@ -13,7 +13,7 @@ public class WriterThread extends Thread
 	private int contigCount;
 	private final BlockingQueue<LinkedList<DirectedEdge>> queue;
 	
-	WriterThread(BufferedWriter w, int k, BlockingQueue<LinkedList<DirectedEdge>> q)
+	public WriterThread(BufferedWriter w, int k, BlockingQueue<LinkedList<DirectedEdge>> q)
 	{
 		writer = w;
 		kmerSize = k;

@@ -1,4 +1,4 @@
-package mainPackage;
+package ui;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;

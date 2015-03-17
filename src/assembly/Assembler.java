@@ -1,9 +1,4 @@
-package mainPackage;
-
-import graph.debruijn.DeBruijnGraph;
-import graph.debruijn.improved.ImprovedDBG;
-import graph.overlap.OverlapGraph;
-
+package assembly;
 import java.io.File;
 
 public class Assembler 
@@ -23,8 +18,7 @@ public class Assembler
 	
 	public static void main(String args[]) 
 	{
-//		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.GREEDY };//, AssemblyMethods.OVERLAP, AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
-		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.IMPROVED_DE_BRUIJN };
+		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.GREEDY };//, AssemblyMethods.OVERLAP, AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
 		
 		programStartTime = System.nanoTime();
 		
@@ -34,7 +28,7 @@ public class Assembler
 				System.out.println("Method: DeBruijnGraph");
 				
 				graphConstructionStartTime = System.nanoTime();
-				DeBruijnGraph dbg = new DeBruijnGraph();
+				TypicalDeBruijnGraph dbg = new TypicalDeBruijnGraph();
 				dbg.constructGraph(new File(READS_FILE_NAME), KMER_SIZE);
 				graphConstructionEndTime = System.nanoTime();
 				System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
@@ -51,16 +45,16 @@ public class Assembler
 			case OVERLAP:
 				System.out.println("Method: OverlapGraph");
 				graphConstructionStartTime = System.nanoTime();
-				OverlapGraph og = new OverlapGraph(MINIMUM_OVERLAP_LENGTH);
-				og.constructGraph(new File(READS_FILE_NAME), MINIMUM_OVERLAP_LENGTH);
+				OlcOverlapGraph oog = new OlcOverlapGraph(MINIMUM_OVERLAP_LENGTH);
+				oog.constructGraph(new File(READS_FILE_NAME), MINIMUM_OVERLAP_LENGTH);
 				graphConstructionEndTime = System.nanoTime();
 				System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
 				
 				contigGenerationStartTime = System.nanoTime();
-				og.generateContigs(GENERATED_CONTIGS_FILE);
+				oog.generateContigs(GENERATED_CONTIGS_FILE);
 				contigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
-				og = null;
+				oog = null;
 				System.gc();
 				break;
 				
@@ -85,7 +79,7 @@ public class Assembler
 						super.run();
 						System.out.println("Method: Greedy");
 						graphConstructionStartTime = System.nanoTime();
-						graph.greedy.GreedyOverlapGraph gog = new graph.greedy.GreedyOverlapGraph(MINIMUM_OVERLAP_LENGTH);
+						GreedyOverlapGraph gog = new GreedyOverlapGraph(MINIMUM_OVERLAP_LENGTH);
 						gog.constructGraph(new File(READS_FILE_NAME), MINIMUM_OVERLAP_LENGTH);
 						graphConstructionEndTime = System.nanoTime();
 						System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
@@ -115,7 +109,7 @@ public class Assembler
 			case IMPROVED_DE_BRUIJN:
 				System.out.println("Method: ImprovedDeBruijnGraph");
 				graphConstructionStartTime = System.nanoTime();
-				ImprovedDBG idbg = new ImprovedDBG();
+				ImprovedDeBruijnGraph idbg = new ImprovedDeBruijnGraph();
 				idbg.constructGraph(new File(READS_FILE_NAME), KMER_SIZE);
 				graphConstructionEndTime = System.nanoTime();
 				System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);

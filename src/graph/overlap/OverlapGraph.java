@@ -1,30 +1,27 @@
 package graph.overlap;
+
+import interfaces.IGraph;
+
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Scanner;
 
-import mainPackage.GraphInterface;
-
-public class OverlapGraph implements GraphInterface {
+public abstract class OverlapGraph implements IGraph {
 	private static int minimumOverlapLength;
 	private LinkedHashMap<String, Node> nodeList;
 	private HashMap<Node, LinkedList<DirectedEdge>> adjacencyList;
-	int fastaLineLength = 80;
+	private Node leastIndegreeNode;
 	
-	public OverlapGraph(int minimumOverlapLength) {
+	protected OverlapGraph(int minimumOverlapLength) {
 		OverlapGraph.minimumOverlapLength = minimumOverlapLength;
         nodeList = new LinkedHashMap<String, Node>();
         adjacencyList = new HashMap<Node, LinkedList<DirectedEdge>>();
     }
 	
-	public Node addNode(String value) {
+	protected Node addNode(String value) {
 		if (nodeList.containsKey(value))
 			return nodeList.get(value);
 	    Node newNode = new Node(value);
@@ -33,26 +30,16 @@ public class OverlapGraph implements GraphInterface {
 	    for(Node node : nodeList.values())
 	    	checkForOverlapsAndAddEdges(node, newNode);
 	    
+	    if(nodeList.size() == 1)
+	    	leastIndegreeNode = newNode;
+	    else
+	    	if(newNode.getIndegree()<leastIndegreeNode.getIndegree())
+	    		leastIndegreeNode = newNode;
+	    
 	    return newNode;
 	}
 	
-	public void checkForOverlapsAndAddEdges(Node node, Node newNode) {
-		String overlap;
-		if(node.getRead().contains(newNode.getRead().substring(0, minimumOverlapLength-1)))
-		{
-			overlap = this.getOverlap(node.getRead(), newNode.getRead(), minimumOverlapLength);
-			if(overlap != null)
-				addEdge(node, newNode, overlap);
-		}
-		if(newNode.getRead().contains(node.getRead().substring(0, minimumOverlapLength-1)))
-		{
-			overlap = this.getOverlap(newNode.getRead(), node.getRead(), minimumOverlapLength);
-			if(overlap != null)
-				addEdge(newNode, node, overlap);
-		}
-	}
-
-	public DirectedEdge addEdge(Node from, Node to, String suffixToPrefix) {
+	protected DirectedEdge addEdge(Node from, Node to, String suffixToPrefix) {
 		LinkedList<DirectedEdge> edgeList;
 		DirectedEdge newEdge;
 		
@@ -77,13 +64,29 @@ public class OverlapGraph implements GraphInterface {
         return newEdge;
 	}
 	
-	public LinkedHashMap<String, Node> getNodeList() { return nodeList;	}
+	protected void checkForOverlapsAndAddEdges(Node node, Node newNode) {
+		String overlap;
+		if(node.getRead().contains(newNode.getRead().substring(0, minimumOverlapLength-1)))
+		{
+			overlap = this.getOverlap(node.getRead(), newNode.getRead(), minimumOverlapLength);
+			if(overlap != null)
+				addEdge(node, newNode, overlap);
+		}
+		if(newNode.getRead().contains(node.getRead().substring(0, minimumOverlapLength-1)))
+		{
+			overlap = this.getOverlap(newNode.getRead(), node.getRead(), minimumOverlapLength);
+			if(overlap != null)
+				addEdge(newNode, node, overlap);
+		}
+	}
 	
-	public LinkedList<DirectedEdge> getAdjacencyList(Node aNode) { return adjacencyList.get(aNode);	}
+	protected LinkedHashMap<String, Node> getNodeList() { return nodeList;	}
 	
-	public HashMap<Node, LinkedList<DirectedEdge>> getAdjacencyList() {	return adjacencyList; }
+	protected LinkedList<DirectedEdge> getAdjacencyList(Node aNode) { return adjacencyList.get(aNode);	}
 	
-	public int getOverlapLength(Node node1, Node node2) {
+	protected HashMap<Node, LinkedList<DirectedEdge>> getAdjacencyList() {	return adjacencyList; }
+	
+	protected int getOverlapLength(Node node1, Node node2) {
 		for (DirectedEdge edge : adjacencyList.get(node1)) {
 			if(edge.getEnd() == node2)
 				return edge.getOverlapLength();
@@ -91,7 +94,7 @@ public class OverlapGraph implements GraphInterface {
 		return 0;
 	}
 	
-	public String getOverlap(String startString, String endString, int minimumOverlapLength) {
+	protected String getOverlap(String startString, String endString, int minimumOverlapLength) {
 		int endIndex = endString.length() - 1;
 		while (endIndex >= minimumOverlapLength	&& !startString.endsWith(endString.substring(0, endIndex)))
 			endIndex--;
@@ -100,69 +103,7 @@ public class OverlapGraph implements GraphInterface {
 		return endString.substring(0, endIndex);
 	}
 	
-	public void constructGraph(File readsFile, int minimumOverlapLength) 
-	{
-		try (Scanner fileIn = new Scanner(readsFile)) 
-		{
-			String currentLine = "";
-			StringBuilder read = new StringBuilder();
-			int readCount = 0;
-			new OverlapGraph(minimumOverlapLength);
-			
-			while (fileIn.hasNextLine())
-			{
-				currentLine = fileIn.nextLine();
-
-				if (currentLine.startsWith(">")) {
-					if (!read.toString().equals("")) {
-						this.addNode(read.toString().toUpperCase());
-						readCount++;
-					}
-					read = new StringBuilder();
-				} 
-				else
-					read.append(currentLine.trim());
-			}
-
-			if (!read.toString().equals("")) {
-				this.addNode(read.toString().toUpperCase());
-				readCount++;
-			}
-
-			System.out.println("Number of reads processed: " + readCount);
-		}
-		catch (FileNotFoundException e) {
-			System.err.println("File not found: " + readsFile);
-		}
-	}
-	
-	public void simplifyGraph() 
-    {
-		/*
-        OverlapGraph g;
-        Collection<Node> listOfNodes;
-        String combinedRead;
-        LinkedList<DirectedEdge> listOfEdges;
-        DirectedEdge edgeToEliminate;
-        
-        g = OverlapGraph.getInstance().combineNodesLinkedBySingleEdge;
-        listOfNodes = g.getNodeList();
-        for(Node node : listOfNodes) {
-        	if(node.getOutdegree() == 1) {
-        		listOfEdges = g.getAdjacencyList(node.getRead());
-        		if(listOfEdges.size() != 1)
-        			System.err.println("Numbers of outgoing edges not equal outdegree of node!");
-        		else {
-        			edgeToEliminate = listOfEdges.remove();
-        			combinedRead = node.getRead().concat(edgeToEliminate.getEnd().getRead());
-        			node.setRead(combinedRead);
-        			g.
-        		}
-        	}
-        }*/
-    }
-	
-	private Node getUnvisitedNeighbour(Node aNode) 
+	protected Node getUnvisitedNeighbour(Node aNode) 
     {
 		LinkedList<DirectedEdge> edgeList;
 		
@@ -177,7 +118,51 @@ public class OverlapGraph implements GraphInterface {
 		return null;
     }
 	
-	private void printContigInFastaFormat(BufferedWriter writer, LinkedList<Node> contigNodeList, int contigCount) {
+	protected Node getLeastIndegreeUnvisitedNode()
+	{
+		if(!leastIndegreeNode.isVisited())
+			return leastIndegreeNode;
+		else
+		{
+			Node leastIndegreeUnvisitedNode = null;
+			for (Node node : nodeList.values()) {
+				if(node.isVisited())
+					continue;
+				
+				if (leastIndegreeUnvisitedNode == null)
+					leastIndegreeUnvisitedNode = node;
+				else
+					if(node.getIndegree() < leastIndegreeUnvisitedNode.getIndegree())
+						leastIndegreeUnvisitedNode = node;
+			}
+			return leastIndegreeUnvisitedNode;
+		}
+	}
+
+	protected Node getNextNodeWithHighestOverlapLength(Node currentNode) {
+		
+		DirectedEdge edgeWithHighestOverlapLength = null;
+		if(adjacencyList.get(currentNode.getRead()) == null)
+			return null;
+		
+		for (DirectedEdge edge : adjacencyList.get(currentNode.getRead())) {
+			if(edge.getEnd().isVisited())
+				continue;
+			
+			if(edgeWithHighestOverlapLength == null)
+				edgeWithHighestOverlapLength = edge;
+			else
+				if(edge.getOverlapLength()>edgeWithHighestOverlapLength.getOverlapLength())
+					edgeWithHighestOverlapLength = edge;
+		}
+		
+		if(edgeWithHighestOverlapLength == null)
+			return null;
+		else
+			return edgeWithHighestOverlapLength.getEnd();
+	}
+	
+	protected void printContigInFastaFormat(BufferedWriter writer, LinkedList<Node> contigNodeList, int contigCount) {
 		
 		try{
 			int writerRemainingLineSpace = 0;
@@ -223,52 +208,6 @@ public class OverlapGraph implements GraphInterface {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void generateContigs(String outputFile) 
-    {
-		HashMap<Node, LinkedList<DirectedEdge>> adjacencyList;
-		LinkedList<Node> nodeList;
-		Node startingNode, aNode;
-		Iterator<Node> i;
-		BufferedWriter writer;
-		int contigCount;
-		
-		try {
-			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-			nodeList = new LinkedList<Node>();
-			adjacencyList = this.getAdjacencyList();
-			contigCount = 0;
-			i = adjacencyList.keySet().iterator();
-
-			while (i.hasNext()) {
-				startingNode = i.next();
-
-				if (!startingNode.isVisited()) {
-					nodeList.add(startingNode);
-					startingNode.setVisited();
-					while (!nodeList.isEmpty()) {
-						aNode = getUnvisitedNeighbour(nodeList.getLast());
-
-						if (aNode == null) {
-							contigCount++;
-							printContigInFastaFormat(writer, (LinkedList<Node>) nodeList.clone(), contigCount);
-							nodeList.removeLast();
-						} else {
-							aNode.setVisited();
-							nodeList.add(aNode);
-						}
-					}
-				}
-			}
-			
-			System.out.println("Number of contigs generated: " + contigCount);
-			writer.close();
-		}
-		catch (FileNotFoundException e) {
-			System.err.println("File not found: " + outputFile);
-		}
-		catch (IOException e) {
-			System.err.println("OverlapGraph:generateContigs file "+outputFile+" cannot be created or opened");
-		}
-    }
+	public abstract void constructGraph(File readsFile, int minimumOverlapLength);
+	public abstract void generateContigs(String outputFile);
 }
