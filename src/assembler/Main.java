@@ -1,7 +1,7 @@
-package assembly;
+package assembler;
 import java.io.File;
 
-public class Assembler 
+public class Main 
 {
 	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, GREEDY, IMPROVED_DE_BRUIJN };
 	

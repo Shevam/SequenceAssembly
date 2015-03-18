@@ -19,7 +19,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import assembly.ReadsGenerator;
+import assembler.ReadsGenerator;
 
 public class ReadsGeneratorPanel extends JPanel {
 	private static final long serialVersionUID = 1L;

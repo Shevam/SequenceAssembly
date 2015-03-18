@@ -1,4 +1,4 @@
-package assembly;
+package assembler;
 
 import interfaces.IGraph;
 

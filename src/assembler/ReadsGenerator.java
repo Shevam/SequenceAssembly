@@ -1,4 +1,4 @@
-package assembly;
+package assembler;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;

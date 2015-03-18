@@ -1,4 +1,4 @@
-package assembly;
+package assembler;
 
 import graph.overlap.*;
 import interfaces.IGraph;
@@ -8,11 +8,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
-	public GreedyOverlapGraph(int minimumOverlapLength) {
+public class OlcOverlapGraph extends OverlapGraph implements IGraph {
+	public OlcOverlapGraph(int minimumOverlapLength) {
 		super(minimumOverlapLength);
 	}
 	
@@ -23,7 +25,7 @@ public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
 			String currentLine = "";
 			StringBuilder read = new StringBuilder();
 			int readCount = 0;
-			new GreedyOverlapGraph(minimumOverlapLength);
+			new OlcOverlapGraph(minimumOverlapLength);
 			
 			while (fileIn.hasNextLine())
 			{
@@ -52,40 +54,52 @@ public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void generateContigs(String outputFile) 
     {
+		HashMap<Node, LinkedList<DirectedEdge>> adjacencyList;
+		LinkedList<Node> nodeList;
+		Node startingNode, aNode;
+		Iterator<Node> i;
 		BufferedWriter writer;
-		LinkedList<Node> contigNodeList;
-		Node currentNode;
-		int contigCount = 0;
+		int contigCount;
 		
-		try
-		{
+		try {
 			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-			while (true)
-			{
-				contigNodeList = new LinkedList<Node>();
-				currentNode = this.getLeastIndegreeUnvisitedNode();
-				if(currentNode == null)
-					break;
-				
-		        while(currentNode != null)
-		        {
-		        	contigNodeList.add(currentNode);
-			        currentNode.setVisited();
-			        currentNode = this.getNextNodeWithHighestOverlapLength(currentNode);
-		        }
-		        
-		        contigCount++;
-		        printContigInFastaFormat(writer, contigNodeList, contigCount);
+			nodeList = new LinkedList<Node>();
+			adjacencyList = this.getAdjacencyList();
+			contigCount = 0;
+			i = adjacencyList.keySet().iterator();
+			
+			while (i.hasNext()) {
+				startingNode = i.next();
+
+				if (!startingNode.isVisited()) {
+					nodeList.add(startingNode);
+					startingNode.setVisited();
+					while (!nodeList.isEmpty()) {
+						aNode = getUnvisitedNeighbour(nodeList.getLast());
+
+						if (aNode == null) {
+							contigCount++;
+							printContigInFastaFormat(writer, (LinkedList<Node>) nodeList.clone(), contigCount);
+							nodeList.removeLast();
+						} else {
+							aNode.setVisited();
+							nodeList.add(aNode);
+						}
+					}
+				}
 			}
+			
 			System.out.println("Number of contigs generated: " + contigCount);
 			writer.close();
 		}
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + outputFile);
-		} catch (IOException e) {
-			System.err.println("GreedyOverlapGraph:generateContigs file "+outputFile+" cannot be created or opened");
+		}
+		catch (IOException e) {
+			System.err.println("OlcOverlapGraph:generateContigs file "+outputFile+" cannot be created or opened");
 		}
     }
 }
