@@ -18,7 +18,7 @@ public class Main
 	
 	public static void main(String args[]) 
 	{
-		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.GREEDY };//, AssemblyMethods.OVERLAP, AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
+		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.DE_BRUIJN };//, AssemblyMethods.OVERLAP, AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
 		
 		programStartTime = System.nanoTime();
 		
@@ -34,7 +34,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
 				
 				contigGenerationStartTime = System.nanoTime();
-				dbg.generateContigs(GENERATED_CONTIGS_FILE);
+				dbg.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
 				contigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
 				
@@ -51,7 +51,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
 				
 				contigGenerationStartTime = System.nanoTime();
-				oog.generateContigs(GENERATED_CONTIGS_FILE);
+				oog.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
 				contigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
 				oog = null;
@@ -59,20 +59,22 @@ public class Main
 				break;
 				
 			case GREEDY:
-//				System.out.println("Method: Greedy");
-//				graphConstructionStartTime = System.nanoTime();
-//				GreedyOverlapGraph gog = new GreedyOverlapGraph(MINIMUM_OVERLAP_LENGTH);
-//				gog.constructGraph(new File(READS_FILE_NAME), MINIMUM_OVERLAP_LENGTH);
-//				graphConstructionEndTime = System.nanoTime();
-//				System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
-//				
-//				contigGenerationStartTime = System.nanoTime();
-//				gog.generateContigs(GENERATED_CONTIGS_FILE);
-//				contigGenerationEndTime = System.nanoTime();
-//				System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
-//				gog = null;
-//				System.gc();
+				System.out.println("Method: Greedy");
+				graphConstructionStartTime = System.nanoTime();
+				GreedyOverlapGraph gog = new GreedyOverlapGraph(MINIMUM_OVERLAP_LENGTH);
+				gog.constructGraph(new File(READS_FILE_NAME), MINIMUM_OVERLAP_LENGTH);
+				graphConstructionEndTime = System.nanoTime();
+				System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
 				
+				contigGenerationStartTime = System.nanoTime();
+				gog.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
+				contigGenerationEndTime = System.nanoTime();
+				System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
+				gog = null;
+				System.gc();
+				break;
+				
+				/*
 				Thread t = new Thread() {
 					@Override
 					public void run() {
@@ -85,7 +87,7 @@ public class Main
 						System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
 						
 						contigGenerationStartTime = System.nanoTime();
-						gog.generateContigs(GENERATED_CONTIGS_FILE);
+						gog.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
 						contigGenerationEndTime = System.nanoTime();
 						System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
 						gog = null;
@@ -105,7 +107,7 @@ public class Main
 				}
 				System.out.println("Thread time(ms) = " + (prev/1000000));
 				break;
-				
+				*/
 			case IMPROVED_DE_BRUIJN:
 				System.out.println("Method: ImprovedDeBruijnGraph");
 				graphConstructionStartTime = System.nanoTime();
@@ -115,7 +117,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (graphConstructionEndTime - graphConstructionStartTime) / 1000000);
 				//DeBruijnGraph.getInstance().displayGraph();
 				contigGenerationStartTime = System.nanoTime();
-				idbg.generateContigs(GENERATED_CONTIGS_FILE);
+				idbg.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
 				contigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (contigGenerationEndTime - contigGenerationStartTime) / 1000000);
 				idbg = null;

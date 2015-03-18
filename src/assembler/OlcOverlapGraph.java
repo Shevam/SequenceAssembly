@@ -55,38 +55,43 @@ public class OlcOverlapGraph extends OverlapGraph implements IGraph {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void generateContigs(String outputFile) 
+	public void traverseGraphToGenerateContigs(String outputFile) 
     {
 		HashMap<Node, LinkedList<DirectedEdge>> adjacencyList;
-		LinkedList<Node> nodeList;
-		Node startingNode, aNode;
+		LinkedList<Node> contigNodeList;
+		Node contigStartingNode, aNode;
 		Iterator<Node> i;
 		BufferedWriter writer;
 		int contigCount;
-		
+		boolean newContigNodeAdded;
 		try {
 			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-			nodeList = new LinkedList<Node>();
+			contigNodeList = new LinkedList<Node>();
 			adjacencyList = this.getAdjacencyList();
 			contigCount = 0;
 			i = adjacencyList.keySet().iterator();
 			
 			while (i.hasNext()) {
-				startingNode = i.next();
-
-				if (!startingNode.isVisited()) {
-					nodeList.add(startingNode);
-					startingNode.setVisited();
-					while (!nodeList.isEmpty()) {
-						aNode = getUnvisitedNeighbour(nodeList.getLast());
-
-						if (aNode == null) {
-							contigCount++;
-							printContigInFastaFormat(writer, (LinkedList<Node>) nodeList.clone(), contigCount);
-							nodeList.removeLast();
-						} else {
+				contigStartingNode = i.next();
+				
+				if (!contigStartingNode.isVisited()) {
+					contigNodeList.add(contigStartingNode);
+					contigStartingNode.setVisited();
+					newContigNodeAdded = true;
+					while (!contigNodeList.isEmpty()) {
+						aNode = getUnvisitedNeighbour(contigNodeList.getLast());
+						if (aNode != null) {
 							aNode.setVisited();
-							nodeList.add(aNode);
+							contigNodeList.add(aNode);
+							newContigNodeAdded = true;
+						}
+						else {
+							if (newContigNodeAdded) {
+								contigCount++;
+								printContigInFastaFormat(writer, (LinkedList<Node>) contigNodeList.clone(), contigCount);
+								newContigNodeAdded = false;
+							}
+							contigNodeList.removeLast();
 						}
 					}
 				}
@@ -103,3 +108,4 @@ public class OlcOverlapGraph extends OverlapGraph implements IGraph {
 		}
     }
 }
+

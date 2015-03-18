@@ -1,5 +1,4 @@
 package graph.debruijn;
-
 import interfaces.IGraph;
 
 import java.io.BufferedWriter;
@@ -11,12 +10,12 @@ import java.util.LinkedList;
 
 public abstract class DeBruijnGraph implements IGraph {
 	LinkedHashMap<String, Node> nodeList;
-	HashMap<String, LinkedList<DirectedEdge>> adjacencyList;
+	HashMap<Node, LinkedList<DirectedEdge>> adjacencyList;
 	int k;
 	
 	protected DeBruijnGraph() {
 		nodeList = new LinkedHashMap<String, Node>();
-		adjacencyList = new HashMap<String, LinkedList<DirectedEdge>>();
+		adjacencyList = new HashMap<Node, LinkedList<DirectedEdge>>();
 	}
 	
 	protected Node addNode(String km1mer) {
@@ -31,7 +30,7 @@ public abstract class DeBruijnGraph implements IGraph {
 		Node prefixNode, suffixNode;
 		DirectedEdge newEdge;
 		LinkedList<DirectedEdge> edgeList;
-
+		
 		prefixNode = nodeList.get(prefixString);
 		if (prefixNode == null)
 			prefixNode = addNode(prefixString);
@@ -40,11 +39,10 @@ public abstract class DeBruijnGraph implements IGraph {
 		if (suffixNode == null)
 			suffixNode = addNode(suffixString);
 		
-		edgeList = adjacencyList.get(prefixString);
+		edgeList = adjacencyList.get(prefixNode);
 		
 		if (edgeList == null) {
-			adjacencyList.put(prefixString, new LinkedList<DirectedEdge>());
-			edgeList = adjacencyList.get(prefixString);
+			adjacencyList.put(prefixNode, new LinkedList<DirectedEdge>());
 		}
 		else {
 			for (DirectedEdge edge : edgeList) {
@@ -56,7 +54,7 @@ public abstract class DeBruijnGraph implements IGraph {
 		}
 		
 		newEdge = new DirectedEdge(prefixNode, suffixNode);
-		edgeList.add(newEdge);
+		adjacencyList.get(prefixNode).add(newEdge);
 		prefixNode.incrementOutdegree();
 		suffixNode.incrementIndegree();
 		
@@ -67,9 +65,9 @@ public abstract class DeBruijnGraph implements IGraph {
 	protected void setK(int value) { this.k = value; }
 	
 	protected DirectedEdge getUnvisitedEdge() {
-		for (String nodeValue : nodeList.keySet()) {
-			if (adjacencyList.get(nodeValue) != null) {
-				for (DirectedEdge edge : adjacencyList.get(nodeValue)) {
+		for (Node node : nodeList.values()) {
+			if (adjacencyList.get(node) != null) {
+				for (DirectedEdge edge : adjacencyList.get(node)) {
 					if (!edge.isVisited())
 						return edge;
 				}
@@ -78,20 +76,20 @@ public abstract class DeBruijnGraph implements IGraph {
 		return null;
 	}
 	
-	protected synchronized DirectedEdge getUnvisitedEdge(Node currentNode) {
-		if (adjacencyList.get(currentNode.getKm1mer()) != null) {
-			for (DirectedEdge edge : adjacencyList.get(currentNode.getKm1mer())) {
+	protected DirectedEdge getUnvisitedEdge(Node currentNode) {
+		if (adjacencyList.get(currentNode) != null) {
+			for (DirectedEdge edge : adjacencyList.get(currentNode)) {
 				if (!edge.isVisited())
 					return edge;
 			}
 		}
 		return null;
 	}
-
+	
 	protected DirectedEdge getZeroInDegreeUnvisitedEdge() {
-		for (String nodeValue : nodeList.keySet()) {
-			if (adjacencyList.get(nodeValue) != null) {
-				for (DirectedEdge edge : adjacencyList.get(nodeValue)) {
+		for (Node node : nodeList.values()) {
+			if (adjacencyList.get(node) != null) {
+				for (DirectedEdge edge : adjacencyList.get(node)) {
 					if (!edge.isVisited() && (edge.getStart().getIndegree() == 0))
 						return edge;
 				}
@@ -106,7 +104,7 @@ public abstract class DeBruijnGraph implements IGraph {
 		for (int i = 0; i < read.length() - kmerSize + 1; i++)
 			this.addEdge(read.substring(i, i + kmerSize - 1), read.substring(i + 1, i + kmerSize));
 	}
-
+	
 	protected void printContigInFastaFormat(BufferedWriter writer, LinkedList<DirectedEdge> contigEdgeList, int contigCount, int kmerSize) 
 	{
 		int writerRemainingLineSpace, counter;
@@ -142,8 +140,6 @@ public abstract class DeBruijnGraph implements IGraph {
 			System.err.println("DebruijnGraph:printContigInFastaFormat: error while writing to file");
 		}
 	}
-
-	
 	
 	public void displayNodes() {
 		System.out.println("Nodes (indeg, outdeg): ");
@@ -152,10 +148,9 @@ public abstract class DeBruijnGraph implements IGraph {
 		}
 		System.out.println();
 	}
-	
 	public void displayEdges() {
 		System.out.println("Edges: ");
-		for (String node : nodeList.keySet()) {
+		for (Node node : nodeList.values()) {
 			if (adjacencyList.get(node) != null) {
 				for (DirectedEdge edge : adjacencyList.get(node)) {
 					edge.print();
@@ -164,11 +159,10 @@ public abstract class DeBruijnGraph implements IGraph {
 		}
 		System.out.println();
 	}
-	
 	public void displayGraph() {
 		System.out.println("Graph adjacency List:");
-		for (String node : nodeList.keySet()) {
-			System.out.print(node + " --> ");
+		for (Node node : nodeList.values()) {
+			System.out.print(node.getKm1mer() + " --> ");
 			if (adjacencyList.get(node) != null) {
 				for (DirectedEdge edge : adjacencyList.get(node)) {
 					System.out.print(edge.getEnd().getKm1mer() + ", ");
@@ -180,5 +174,6 @@ public abstract class DeBruijnGraph implements IGraph {
 	}
 	
 	public abstract void constructGraph(File readsFile, int kmerSize);
-	public abstract void generateContigs(String outputFile);
+	public abstract void traverseGraphToGenerateContigs(String outputFile);
 }
+

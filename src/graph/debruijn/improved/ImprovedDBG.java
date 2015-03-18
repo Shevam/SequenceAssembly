@@ -2,15 +2,17 @@ package graph.debruijn.improved;
 import interfaces.IGraph;
 
 import java.io.File;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ImprovedDBG implements IGraph {
-	LinkedHashMap<String, Node> nodeList;
+	ConcurrentHashMap<String, Node> nodeList;
 	int kmerSize;
 	
 	protected ImprovedDBG() {
 		super();
-		nodeList = new LinkedHashMap<String, Node>();
+		nodeList = new ConcurrentHashMap<String, Node>();
 	}
 	
 	protected Node addNode(String km1mer) {
@@ -69,22 +71,34 @@ public abstract class ImprovedDBG implements IGraph {
 	}
 	
 	protected DirectedEdge getUnvisitedEdge() {
-		for (Node node : nodeList.values()) {
-			if (node.edgeList.peek()!=null && node.edgeList.peek().getWeight() > 0) {
-				return node.edgeList.peek();
-			}
-		}
+		Iterator<Entry<String, Node>> iter = nodeList.entrySet().iterator();
+        Entry<String, Node> entry;
+        DirectedEdge edge;
+        while(iter.hasNext())
+        {
+            entry = iter.next();
+            edge = entry.getValue().getUnvisitedEdge();
+            if (edge != null) {
+            	return edge;
+            }
+        }
 		return null;
 	}
 
 	protected DirectedEdge getUnvisitedEdgeFromZeroIndegreeNode() {
-		for (Node node : nodeList.values()) {
-			for (DirectedEdge e : node.edgeList) {
-				if ((e.getStart().getIndegree() == 0) && (e.getWeight()>0)) {
-					return e;
-				}
-			}
-		}
+		Iterator<Entry<String, Node>> iter = nodeList.entrySet().iterator();
+        Node node;
+        DirectedEdge edge;
+        while(iter.hasNext())
+        {
+            node = iter.next().getValue();
+            if (node.getIndegree() == 0) {
+            	edge = node.getUnvisitedEdge();
+            	if (edge != null) {
+            		return edge;
+            	}
+            }
+        }
 		return null;
 	}
 	    
@@ -114,6 +128,6 @@ public abstract class ImprovedDBG implements IGraph {
 	}
 	
 	public abstract void constructGraph(File readsFile, int kmerSize);
-	public abstract void generateContigs(String generatedContigsFile);
+	public abstract void traverseGraphToGenerateContigs(String generatedContigsFile);
 	
 }

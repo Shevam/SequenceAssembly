@@ -1,7 +1,6 @@
 package graph.overlap;
 
 public class Node {
-
 	private String read;
 	private boolean isVisited;
 	private int indegree, outdegree;
@@ -26,6 +25,7 @@ public class Node {
 	public void incrementOutdegree() { this.outdegree++; }
 	
 	public void printNodeInfo() {
-		System.out.println("(" + indegree+", " + outdegree + ", " + isVisited + ")");
+		System.out.println("("+indegree+", "+outdegree+", "+isVisited+")");
 	}
 }
+

@@ -42,7 +42,7 @@ public class TraversalThread extends Thread
 			else {
 				if(edgeAdded) {
 					try {
-						queue.put((LinkedList<DirectedEdge>) path.clone());
+						queue.put((LinkedList<DirectedEdge>) path);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

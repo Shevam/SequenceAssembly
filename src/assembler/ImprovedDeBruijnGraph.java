@@ -61,18 +61,18 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 		}
 	}
 	
-	public void generateContigs(String generatedContigsFile)
+	public void traverseGraphToGenerateContigs(String generatedContigsFile)
 	{
 		DirectedEdge unvisitedEdge;
 		BufferedWriter writer;
 		TraversalThread traversalThread;
 		ExecutorService es;
 		boolean finished;
-		BlockingQueue<LinkedList<DirectedEdge>> q = new LinkedBlockingQueue<LinkedList<DirectedEdge>>();
+		BlockingQueue<LinkedList<DirectedEdge>> queue = new LinkedBlockingQueue<LinkedList<DirectedEdge>>();
 		try
 		{
 			writer = new BufferedWriter(new FileWriter(new File(generatedContigsFile)));
-			new WriterThread(writer, this.getKmerSize(), q);
+			new WriterThread(writer, this.getKmerSize(), queue);
 			
 			es = Executors.newFixedThreadPool(8);
 			while (true)
@@ -81,7 +81,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 				if(unvisitedEdge==null)
 					break;
 				
-				es.execute(traversalThread = new TraversalThread(unvisitedEdge, q));
+				es.execute(traversalThread = new TraversalThread(unvisitedEdge, queue));
 			}
 			es.shutdown();
 			
@@ -96,7 +96,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			unvisitedEdge = this.getUnvisitedEdge();
 			while(unvisitedEdge!=null)
 			{
-				traversalThread = new TraversalThread(unvisitedEdge, q);
+				traversalThread = new TraversalThread(unvisitedEdge, queue);
 				
 				try {
 					traversalThread.start();

@@ -1,18 +1,18 @@
 package graph.debruijn.improved;
-import java.util.Comparator;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Node {
 
 	private String km1mer;
 	private int indegree, outdegree;
-	public PriorityBlockingQueue<DirectedEdge> edgeList;
+	public ConcurrentLinkedQueue<DirectedEdge> edgeList;
 	
 	public Node(String km1mer) {
 		this.km1mer = km1mer;
 		this.indegree = 0;
 		this.outdegree = 0;
-		this.edgeList = new PriorityBlockingQueue<DirectedEdge>(11, new EdgeComparator());
+		this.edgeList = new ConcurrentLinkedQueue<DirectedEdge>();
 	}
 	
 	public String getKm1mer() { return km1mer; }
@@ -30,8 +30,9 @@ public class Node {
 	
 	public DirectedEdge addEdgeTo(Node endNode) {
 		boolean exists = false;
-		DirectedEdge edge = new DirectedEdge(this, endNode);
-		for (DirectedEdge e : edgeList) {
+		DirectedEdge e, edge = new DirectedEdge(this, endNode);
+		for (Iterator<DirectedEdge> iter = edgeList.iterator(); iter.hasNext();) {
+			e = iter.next();
 			if (endNode == e.getEnd()) {
 				exists = true;
 				edge = e;
@@ -57,24 +58,13 @@ public class Node {
 	}
 	
 	public DirectedEdge getUnvisitedEdge() {
-//		if (this.edgeList.peek()!=null && this.edgeList.peek().getWeight() > 1) {
-//			this.edgeList.peek().decrementWeight();
-//			return this.edgeList.peek();
-//		}
-//		return this.edgeList.poll();
-		if (edgeList.peek()!=null && edgeList.peek().getWeight()==0)
-			System.err.println("HEAD WEIGHT 0!");
-		return this.edgeList.peek();
-	}
-	
-	class EdgeComparator implements Comparator<DirectedEdge> {
-		@Override
-		public int compare(DirectedEdge o1, DirectedEdge o2) {
-			if (o1.getWeight() != 0) 
-				return -1;
-			if (o2.getWeight() != 0)
-				return 1;
-			return 0;
+		DirectedEdge e;
+		for (Iterator<DirectedEdge> iter = edgeList.iterator(); iter.hasNext();) {
+			e = iter.next();
+			if (e.getWeight()>0) {
+				return e;
+			}
 		}
+		return null;
 	}
 }

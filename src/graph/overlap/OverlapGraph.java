@@ -1,5 +1,4 @@
 package graph.overlap;
-
 import interfaces.IGraph;
 
 import java.io.BufferedWriter;
@@ -30,7 +29,7 @@ public abstract class OverlapGraph implements IGraph {
 	    for(Node node : nodeList.values())
 	    	checkForOverlapsAndAddEdges(node, newNode);
 	    
-	    if(nodeList.size() == 1)
+	    if(leastIndegreeNode == null)
 	    	leastIndegreeNode = newNode;
 	    else
 	    	if(newNode.getIndegree()<leastIndegreeNode.getIndegree())
@@ -50,7 +49,6 @@ public abstract class OverlapGraph implements IGraph {
         
         if (edgeList == null) {
 			adjacencyList.put(from, new LinkedList<DirectedEdge>());
-			edgeList = adjacencyList.get(from);
 		}
         else {
         	for(DirectedEdge edge : edgeList)
@@ -59,7 +57,7 @@ public abstract class OverlapGraph implements IGraph {
         }
         
     	newEdge = new DirectedEdge(from, to, suffixToPrefix);
-        edgeList.add(newEdge);
+        adjacencyList.get(from).add(newEdge);
         
         return newEdge;
 	}
@@ -138,14 +136,14 @@ public abstract class OverlapGraph implements IGraph {
 			return leastIndegreeUnvisitedNode;
 		}
 	}
-
+	
 	protected Node getNextNodeWithHighestOverlapLength(Node currentNode) {
 		
 		DirectedEdge edgeWithHighestOverlapLength = null;
-		if(adjacencyList.get(currentNode.getRead()) == null)
+		if(adjacencyList.get(currentNode) == null)
 			return null;
 		
-		for (DirectedEdge edge : adjacencyList.get(currentNode.getRead())) {
+		for (DirectedEdge edge : adjacencyList.get(currentNode)) {
 			if(edge.getEnd().isVisited())
 				continue;
 			
@@ -209,5 +207,6 @@ public abstract class OverlapGraph implements IGraph {
 	}
 	
 	public abstract void constructGraph(File readsFile, int minimumOverlapLength);
-	public abstract void generateContigs(String outputFile);
+	public abstract void traverseGraphToGenerateContigs(String outputFile);
 }
+

@@ -24,15 +24,12 @@ public class DirectedEdge {
 	
 	public int getWeight() { return this.weight; }
 	public void incrementWeight() { this.weight++; }
-	public boolean decrementWeight() {
-		if (this.weight>=1){
+	public void decrementWeight() {
+		if (this.weight>0){
 			this.weight--;
-			if(this.weight == 0)
-				this.isVisited = true;
-			return true;
 		}
 		else
-			return false;
+			this.isVisited = true;
 	}
 	
 	public boolean isVisited() { return isVisited; }
@@ -40,3 +37,4 @@ public class DirectedEdge {
 	
 	public void print() { System.out.println(start.getKm1mer() + " >>" + kmer + ">> " + end.getKm1mer()); }
 }
+

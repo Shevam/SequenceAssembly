@@ -1,15 +1,16 @@
 package graph.debruijn.improved;
-
 public class DirectedEdge {
 	private Node start, end;
 	private String kmer;
 	private int weight;
+	private boolean isVisited;
 	
 	public DirectedEdge(Node start, Node end) {
 		this.start = start;
 		this.end = end;
 		this.kmer = start.getKm1mer() + end.getKm1mer().substring(end.getKm1mer().length() - 1);
 		this.weight = 1;
+		this.isVisited = false;
 	}
 	
 	public synchronized Node getStart() { return start; }
@@ -27,14 +28,12 @@ public class DirectedEdge {
 		if (this.weight>0) {
 			this.weight--;
 		}
+		else
+			this.isVisited = true;
 	}
 	
-	public void setVisited() {
-		decrementWeight();
-		if (weight == 0) {
-			this.getStart().removeEdge(this);
-		}
-	}
+	public boolean isVisited() { return isVisited; }
+	public void setVisited() { decrementWeight(); }
 	
 	public void print() { System.out.println(start.getKm1mer() + " >>" + kmer + ">> " + end.getKm1mer()); }
 }

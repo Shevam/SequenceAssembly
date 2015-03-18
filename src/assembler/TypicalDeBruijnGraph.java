@@ -17,22 +17,19 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 		super();
 	}
 	
-	public void constructGraph(File readsFile, int kmerSize) 
+	public void constructGraph(File readsFile, int k) 
 	{
-		try (Scanner fileIn = new Scanner(readsFile)) 
-		{
+		try (Scanner fileIn = new Scanner(readsFile)) {
 			String currentLine = "";
 			StringBuilder read = new StringBuilder();
 			int readCount = 0;
 			
 			new TypicalDeBruijnGraph();
-			this.setK(kmerSize);
-			System.out.println("kmer size: " + this.getK());
+			this.setK(k);
+			System.out.println("k-mer size: " + this.getK());
 			
-			while (fileIn.hasNextLine())
-			{
+			while (fileIn.hasNextLine()) {
 				currentLine = fileIn.nextLine();
-				
 				if (currentLine.startsWith(">")) {
 					if (!read.toString().equals("")) {
 						breakReadIntoKmersAndAddToGraph(read.toString().toUpperCase());
@@ -43,12 +40,10 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 				else
 					read.append(currentLine.trim());
 			}
-			
 			if (!read.toString().equals("")) {
 				breakReadIntoKmersAndAddToGraph(read.toString().toUpperCase());
 				readCount++;
 			}
-			
 			System.out.println("Number of reads processed: " + readCount);
 		}
 		catch (FileNotFoundException e) {
@@ -56,28 +51,24 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 		}
 	}
 	
-	public void generateContigs(String outputFile)
+	public void traverseGraphToGenerateContigs(String outputFile)
 	{
 		LinkedList<DirectedEdge> contigEdgeList = new LinkedList<DirectedEdge>();
 		DirectedEdge unvisitedEdge;
 		BufferedWriter writer;
 		int contigCount = 0;
 		boolean newContigEdgeAdded;
-		try
-		{
+		try {
 			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
 			
-			while (true)
-			{
+			while (true) {
 				unvisitedEdge = this.getZeroInDegreeUnvisitedEdge();
-				if(unvisitedEdge==null)
-				{
+				if(unvisitedEdge==null) {
 					unvisitedEdge = this.getUnvisitedEdge();
 					if(unvisitedEdge==null)
 						break;
 				}
-				else
-				{
+				else {
 					contigEdgeList.add(unvisitedEdge);
 					unvisitedEdge.setVisited();
 					newContigEdgeAdded = true;
@@ -109,3 +100,5 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 		}
 	}
 }
+
+

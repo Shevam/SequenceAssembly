@@ -1,7 +1,6 @@
 package graph.debruijn;
 
 public class Node {
-
 	private String km1mer;
 	private int indegree, outdegree;
 	
@@ -27,6 +26,5 @@ public class Node {
 	public void printNode() {
 		System.out.println(km1mer + " (" + indegree + ", " + outdegree + ")");
 	}
-	
-	
 }
+

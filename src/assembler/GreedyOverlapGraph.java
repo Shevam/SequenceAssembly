@@ -52,30 +52,26 @@ public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
 		}
 	}
 	
-	public void generateContigs(String outputFile) 
+	public void traverseGraphToGenerateContigs(String outputFile) 
     {
 		BufferedWriter writer;
 		LinkedList<Node> contigNodeList;
 		Node currentNode;
 		int contigCount = 0;
 		
-		try
-		{
+		try {
 			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
-			while (true)
-			{
+			while (true) {
 				contigNodeList = new LinkedList<Node>();
 				currentNode = this.getLeastIndegreeUnvisitedNode();
 				if(currentNode == null)
 					break;
 				
-		        while(currentNode != null)
-		        {
+		        while(currentNode != null) {
 		        	contigNodeList.add(currentNode);
 			        currentNode.setVisited();
 			        currentNode = this.getNextNodeWithHighestOverlapLength(currentNode);
 		        }
-		        
 		        contigCount++;
 		        printContigInFastaFormat(writer, contigNodeList, contigCount);
 			}
@@ -89,3 +85,4 @@ public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
 		}
     }
 }
+
