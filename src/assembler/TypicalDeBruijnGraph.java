@@ -24,7 +24,6 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 			StringBuilder read = new StringBuilder();
 			int readCount = 0;
 			
-			new TypicalDeBruijnGraph();
 			this.setK(k);
 			System.out.println("k-mer size: " + this.getK());
 			
@@ -100,5 +99,3 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 		}
 	}
 }
-
-

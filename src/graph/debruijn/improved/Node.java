@@ -58,12 +58,11 @@ public class Node {
 	}
 	
 	public DirectedEdge getUnvisitedEdge() {
-		DirectedEdge e;
+		DirectedEdge edge;
 		for (Iterator<DirectedEdge> iter = edgeList.iterator(); iter.hasNext();) {
-			e = iter.next();
-			if (e.getWeight()>0) {
-				return e;
-			}
+			edge = iter.next();
+			if (!edge.isVisited())
+				return edge;
 		}
 		return null;
 	}

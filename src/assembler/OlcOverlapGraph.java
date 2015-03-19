@@ -20,15 +20,12 @@ public class OlcOverlapGraph extends OverlapGraph implements IGraph {
 	
 	public void constructGraph(File readsFile, int minimumOverlapLength) 
 	{
-		try (Scanner fileIn = new Scanner(readsFile)) 
-		{
+		try (Scanner fileIn = new Scanner(readsFile)) {
 			String currentLine = "";
 			StringBuilder read = new StringBuilder();
 			int readCount = 0;
-			new OlcOverlapGraph(minimumOverlapLength);
 			
-			while (fileIn.hasNextLine())
-			{
+			while (fileIn.hasNextLine()) {
 				currentLine = fileIn.nextLine();
 
 				if (currentLine.startsWith(">")) {
@@ -46,7 +43,6 @@ public class OlcOverlapGraph extends OverlapGraph implements IGraph {
 				this.addNode(read.toString().toUpperCase());
 				readCount++;
 			}
-
 			System.out.println("Number of reads processed: " + readCount);
 		}
 		catch (FileNotFoundException e) {

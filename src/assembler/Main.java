@@ -8,7 +8,7 @@ public class Main
 	static final String SEQUENCE_FILE = "BorreliaFull_CompleteSequence.fasta";
 	static final String READS_FILE_NAME = "generatedReads.fasta";
 	static final String GENERATED_CONTIGS_FILE = "generatedContigs.fasta";
-	static final int MINIMUM_OVERLAP_LENGTH = 1;
+	static final int MINIMUM_OVERLAP_LENGTH = 10;
 	static final int KMER_SIZE = 41;
 	
 	static long programStartTime, programEndTime;
@@ -18,7 +18,7 @@ public class Main
 	
 	public static void main(String args[]) 
 	{
-		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.DE_BRUIJN };//, AssemblyMethods.OVERLAP, AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
+		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.IMPROVED_DE_BRUIJN };//, AssemblyMethods.OVERLAP, AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
 		
 		programStartTime = System.nanoTime();
 		

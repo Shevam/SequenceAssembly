@@ -1,19 +1,15 @@
 package graph.debruijn.improved;
 import java.util.LinkedList;
-import java.util.concurrent.BlockingQueue;
 
 public class TraversalThread extends Thread
 {
 	DirectedEdge startingEdge;
-	LinkedList<DirectedEdge> path;
-	WriterThread writerThread;
-	private final BlockingQueue<LinkedList<DirectedEdge>> queue;
+	LinkedList<DirectedEdge> contigEdgeList;
 	
-	public TraversalThread(DirectedEdge unvisitedEdge, BlockingQueue<LinkedList<DirectedEdge>> q)
+	public TraversalThread(DirectedEdge unvisitedEdge)
 	{
 		startingEdge=unvisitedEdge;
-		path = new LinkedList<DirectedEdge>();
-		queue = q;
+		contigEdgeList = new LinkedList<DirectedEdge>();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -24,31 +20,27 @@ public class TraversalThread extends Thread
 		DirectedEdge unvisitedEdge;
 		boolean edgeAdded;
 		
-		path.add(startingEdge);
+		contigEdgeList.add(startingEdge);
 		startingEdge.setVisited();
 		
 		edgeAdded = true;
-		while (!path.isEmpty()) {
-			unvisitedEdge = path.getLast();
+		while (!contigEdgeList.isEmpty()) {
+			unvisitedEdge = contigEdgeList.getLast();
 			
 			endNode = unvisitedEdge.getEnd();
 			unvisitedEdge = endNode.getUnvisitedEdge();
 			
 			if (unvisitedEdge!=null) {
 				unvisitedEdge.setVisited();
-				path.add(unvisitedEdge);
+				contigEdgeList.add(unvisitedEdge);
 				edgeAdded = true;
 			}
 			else {
 				if(edgeAdded) {
-					try {
-						queue.put((LinkedList<DirectedEdge>) path);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					WriterThread.getInstance().addContigToWriterQueue((LinkedList<DirectedEdge>) contigEdgeList.clone());
 					edgeAdded = false;
 				}
-				path.removeLast();
+				contigEdgeList.removeLast();
 			}
 		}
 	}

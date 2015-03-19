@@ -7,12 +7,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import graph.debruijn.improved.*;
@@ -25,8 +22,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 	
 	public void constructGraph(File readsFile, int kmerSize) 
 	{
-		try (Scanner fileIn = new Scanner(readsFile)) 
-		{
+		try (Scanner fileIn = new Scanner(readsFile)) {
 			String currentLine = "";
 			StringBuilder read = new StringBuilder();
 			int readCount = 0;
@@ -34,8 +30,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			this.setKmerSize(kmerSize);
 			System.out.println("kmer size: " + this.getKmerSize());
 			
-			while (fileIn.hasNextLine())
-			{
+			while (fileIn.hasNextLine()) {
 				currentLine = fileIn.nextLine();
 
 				if (currentLine.startsWith(">")) {
@@ -44,7 +39,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 						readCount++;
 					}
 					read = new StringBuilder();
-				} 
+				}
 				else
 					read.append(currentLine.trim());
 			}
@@ -65,23 +60,25 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 	{
 		DirectedEdge unvisitedEdge;
 		BufferedWriter writer;
-		TraversalThread traversalThread;
 		ExecutorService es;
 		boolean finished;
-		BlockingQueue<LinkedList<DirectedEdge>> queue = new LinkedBlockingQueue<LinkedList<DirectedEdge>>();
-		try
-		{
+		int noOfConcurrentThreads;
+		
+		try {
 			writer = new BufferedWriter(new FileWriter(new File(generatedContigsFile)));
-			new WriterThread(writer, this.getKmerSize(), queue);
+			new WriterThread(writer, this.getKmerSize());
+			noOfConcurrentThreads = 1;
 			
-			es = Executors.newFixedThreadPool(8);
-			while (true)
-			{			
+			System.out.println("Number of concurrent threads: "+noOfConcurrentThreads);
+			es = Executors.newFixedThreadPool(noOfConcurrentThreads);
+			while (true) {
 				unvisitedEdge = this.getUnvisitedEdgeFromZeroIndegreeNode();
-				if(unvisitedEdge==null)
-					break;
-				
-				es.execute(traversalThread = new TraversalThread(unvisitedEdge, queue));
+				if(unvisitedEdge==null) {
+					unvisitedEdge = this.getUnvisitedEdge();
+					if(unvisitedEdge==null)
+						break;
+				}
+				es.execute(new TraversalThread(unvisitedEdge));
 			}
 			es.shutdown();
 			
@@ -93,22 +90,6 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 				System.err.println("ImprovedDeBruijnGraph:generateContigs: thread executer interrupted while waiting termination of traversal thread");
 			}
 			
-			unvisitedEdge = this.getUnvisitedEdge();
-			while(unvisitedEdge!=null)
-			{
-				traversalThread = new TraversalThread(unvisitedEdge, queue);
-				
-				try {
-					traversalThread.start();
-					traversalThread.join();
-				} catch (IllegalThreadStateException e) {
-					System.err.println("ImprovedDeBruijnGraph:generateContigs: traversal thread was already started");
-				} catch (InterruptedException e) {
-					System.err.println("ImprovedDeBruijnGraph:generateContigs: traversal thread join interrupted by another thread");
-				}
-				
-				unvisitedEdge = this.getUnvisitedEdge();
-			}
 			System.out.println("Number of contigs generated: " + WriterThread.getInstance().getContigCount());
 			writer.close();
 		} catch (IOException e) {

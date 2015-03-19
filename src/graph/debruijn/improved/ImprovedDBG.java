@@ -22,7 +22,7 @@ public abstract class ImprovedDBG implements IGraph {
 		nodeList.put(km1mer, newNode);
 		return newNode;
 	}
-
+	
 	protected DirectedEdge addEdge(String prefixString, String suffixString) {
 		Node prefixNode, suffixNode;
 
@@ -72,36 +72,30 @@ public abstract class ImprovedDBG implements IGraph {
 	
 	protected DirectedEdge getUnvisitedEdge() {
 		Iterator<Entry<String, Node>> iter = nodeList.entrySet().iterator();
-        Entry<String, Node> entry;
         DirectedEdge edge;
-        while(iter.hasNext())
-        {
-            entry = iter.next();
-            edge = entry.getValue().getUnvisitedEdge();
-            if (edge != null) {
+        while(iter.hasNext()) {
+            edge = iter.next().getValue().getUnvisitedEdge();
+            if (edge != null)
             	return edge;
-            }
         }
 		return null;
 	}
-
+	
 	protected DirectedEdge getUnvisitedEdgeFromZeroIndegreeNode() {
 		Iterator<Entry<String, Node>> iter = nodeList.entrySet().iterator();
         Node node;
         DirectedEdge edge;
-        while(iter.hasNext())
-        {
+        while(iter.hasNext()) {
             node = iter.next().getValue();
             if (node.getIndegree() == 0) {
             	edge = node.getUnvisitedEdge();
-            	if (edge != null) {
+            	if (edge != null)
             		return edge;
-            	}
             }
         }
 		return null;
 	}
-	    
+	
 	protected boolean isEulerian() {
     	@SuppressWarnings("unused")
 		int nbal = 0, nsemi = 0, nneither = 0;
@@ -129,5 +123,4 @@ public abstract class ImprovedDBG implements IGraph {
 	
 	public abstract void constructGraph(File readsFile, int kmerSize);
 	public abstract void traverseGraphToGenerateContigs(String generatedContigsFile);
-	
 }
