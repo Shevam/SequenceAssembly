@@ -12,8 +12,9 @@ public class MainFrame extends JFrame {
 	private static final String TabNameStyleStart = "<html><body marginwidth=10 marginheight=10>";
 	private static final String TabNameStyleEnd = "</body></html>";
 	
-	@SuppressWarnings("unused")  //modify if tabs modified
-	private static final int ReadsGeneratorTabIndex = 0, GenomeAssemblerTabIndex = 1, SummaryTabIndex = 2;
+	static final int ReadsGeneratorTabIndex = 0;
+	static final int GenomeAssemblerTabIndex = 1;
+	static final int SummaryTabIndex = 2;
 	
 	JTabbedPane tabbedPane;
 	
@@ -44,29 +45,20 @@ public class MainFrame extends JFrame {
 		getContentPane().setLayout(groupLayout);
 		tabbedPane.addTab(TabNameStyleStart+"Reads Generator"+TabNameStyleEnd, new ReadsGeneratorPanel(tabbedPane));
 		tabbedPane.addTab(TabNameStyleStart+"Assembly Methods"+TabNameStyleEnd, new GenomeAssemblyPanel(tabbedPane));
-		tabbedPane.addTab(TabNameStyleStart+"Summary"+TabNameStyleEnd, new SummaryPanel());
+		tabbedPane.addTab(TabNameStyleStart+"Summary"+TabNameStyleEnd, new SummaryPanel(tabbedPane));
 		
 		this.setVisible(true);
 	}
 
 //	private class ReadsGeneratorPanel extends JPanel {
-//		private static final long serialVersionUID = 1L;
-//		
-//		public ReadsGeneratorPanel() {
-//		}	
+//	
 //	}
 //	
 //	private class GenomeAssemblyPanel extends JPanel {
-//		private static final long serialVersionUID = 2L;
-//		
-//		public GenomeAssemblyPanel() {
-//		}
+//	
 //	}
 //	
-	private class SummaryPanel extends javax.swing.JPanel {
-		private static final long serialVersionUID = 3L;
-		
-		public SummaryPanel() {
-		}
-	}
+//	private class SummaryPanel extends JPanel {
+//	
+//	}
 }

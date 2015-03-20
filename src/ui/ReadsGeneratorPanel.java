@@ -39,7 +39,6 @@ public class ReadsGeneratorPanel extends JPanel {
 	private JTextArea txtDescription;
 	
 	private JTabbedPane tabbedPane; // TODO Isolate
-	private int GenomeAssemblerTabIndex = 1;
 	
 	public ReadsGeneratorPanel(JTabbedPane tp) {
 		this.tabbedPane = tp;
@@ -122,7 +121,7 @@ public class ReadsGeneratorPanel extends JPanel {
 		btnNext = new JButton("Next");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				tabbedPane.setSelectedIndex(GenomeAssemblerTabIndex);
+				tabbedPane.setSelectedIndex(MainFrame.GenomeAssemblerTabIndex);
 			}
 		});
 		

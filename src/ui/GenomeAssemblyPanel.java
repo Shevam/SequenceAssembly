@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 public class GenomeAssemblyPanel extends JPanel {
 	private static final long serialVersionUID = 2L;
 	private JTabbedPane tabbedPane; // TODO Isolate
-	private int SummaryTabIndex = 2;
 	
 	private JLabel lblReadsFile;
 	private JTextField txtReadsFile;
@@ -67,7 +66,7 @@ public class GenomeAssemblyPanel extends JPanel {
 		btnNext = new JButton("Next");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				tabbedPane.setSelectedIndex(SummaryTabIndex);
+				tabbedPane.setSelectedIndex(MainFrame.SummaryTabIndex);
 			}
 		});
 	
