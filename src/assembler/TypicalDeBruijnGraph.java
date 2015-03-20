@@ -61,12 +61,9 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
 			
 			while (true) {
-				unvisitedEdge = this.getZeroInDegreeUnvisitedEdge();
-				if(unvisitedEdge==null) {
-					unvisitedEdge = this.getUnvisitedEdge();
-					if(unvisitedEdge==null)
-						break;
-				}
+				unvisitedEdge = this.getUnvisitedEdge();
+				if(unvisitedEdge==null)
+					break;
 				else {
 					contigEdgeList.add(unvisitedEdge);
 					unvisitedEdge.setVisited();

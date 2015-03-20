@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ImprovedDBG implements IGraph {
-	ConcurrentHashMap<String, Node> nodeList;
-	int kmerSize;
+	protected ConcurrentHashMap<String, Node> nodeList;
+	protected int kmerSize;
 	
 	protected ImprovedDBG() {
 		super();

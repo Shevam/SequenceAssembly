@@ -6,12 +6,14 @@ public class Node {
 
 	private String km1mer;
 	private int indegree, outdegree;
+	private boolean edgeListVisited;
 	public ConcurrentLinkedQueue<DirectedEdge> edgeList;
 	
 	public Node(String km1mer) {
 		this.km1mer = km1mer;
 		this.indegree = 0;
 		this.outdegree = 0;
+		this.edgeListVisited = false;
 		this.edgeList = new ConcurrentLinkedQueue<DirectedEdge>();
 	}
 	
@@ -29,24 +31,23 @@ public class Node {
 	public boolean isSemiBalanced() { return (Math.abs(indegree - outdegree) == 1); }
 	
 	public DirectedEdge addEdgeTo(Node endNode) {
-		boolean exists = false;
-		DirectedEdge e, edge = new DirectedEdge(this, endNode);
+		DirectedEdge newEdge, currentEdge;
+		
 		for (Iterator<DirectedEdge> iter = edgeList.iterator(); iter.hasNext();) {
-			e = iter.next();
-			if (endNode == e.getEnd()) {
-				exists = true;
-				edge = e;
-				break;
+			currentEdge = iter.next();
+			if (endNode == currentEdge.getEnd()) {
+				currentEdge.incrementWeight();
+				this.incrementOutdegree();
+				endNode.incrementIndegree();
+				return currentEdge;
 			}
 		}
-		if (exists) {
-			edge.incrementWeight();
-		} else {
-			edgeList.add(edge);
-		}
-		edge.getStart().incrementOutdegree();
-		edge.getEnd().incrementIndegree();
-		return edge;
+		
+		newEdge = new DirectedEdge(this, endNode);
+		edgeList.add(newEdge);
+		this.incrementOutdegree();
+		endNode.incrementIndegree();
+		return newEdge;
 	}
 	
 	public DirectedEdge removeEdge(DirectedEdge edgeToRemove) {
@@ -59,11 +60,16 @@ public class Node {
 	
 	public DirectedEdge getUnvisitedEdge() {
 		DirectedEdge edge;
+		
+		if (edgeListVisited)
+			return null;
+		
 		for (Iterator<DirectedEdge> iter = edgeList.iterator(); iter.hasNext();) {
 			edge = iter.next();
 			if (!edge.isVisited())
 				return edge;
 		}
+		edgeListVisited = true;
 		return null;
 	}
 }
