@@ -27,36 +27,36 @@ public abstract class DeBruijnGraph implements IGraph {
 	}
 	
 	protected DirectedEdge addEdge(String prefixString, String suffixString) {
-		Node prefixNode, suffixNode;
+		Node startingNode, endingNode;
 		DirectedEdge newEdge;
 		LinkedList<DirectedEdge> edgeList;
 		
-		prefixNode = nodeList.get(prefixString);
-		if (prefixNode == null)
-			prefixNode = addNode(prefixString);
+		startingNode = nodeList.get(prefixString);
+		if (startingNode == null)
+			startingNode = addNode(prefixString);
 		
-		suffixNode = nodeList.get(suffixString);
-		if (suffixNode == null)
-			suffixNode = addNode(suffixString);
+		endingNode = nodeList.get(suffixString);
+		if (endingNode == null)
+			endingNode = addNode(suffixString);
 		
-		edgeList = adjacencyList.get(prefixNode);
+		edgeList = adjacencyList.get(startingNode);
 		
 		if (edgeList == null) {
-			adjacencyList.put(prefixNode, new LinkedList<DirectedEdge>());
+			adjacencyList.put(startingNode, new LinkedList<DirectedEdge>());
 		}
 		else {
 			for (DirectedEdge edge : edgeList) {
-				if(edge.getEnd()==suffixNode){
+				if(edge.getEnd()==endingNode){
 					edge.incrementWeight();
 					return edge;
 				}
 			}
 		}
 		
-		newEdge = new DirectedEdge(prefixNode, suffixNode);
-		adjacencyList.get(prefixNode).add(newEdge);
-		prefixNode.incrementOutdegree();
-		suffixNode.incrementIndegree();
+		newEdge = new DirectedEdge(startingNode, endingNode);
+		adjacencyList.get(startingNode).add(newEdge);
+		startingNode.incrementOutdegree();
+		endingNode.incrementIndegree();
 		
 		return newEdge;
 	}

@@ -30,14 +30,14 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			int readCount = 0;
 			
 			this.setKmerSize(kmerSize);
-			System.out.println("kmer size: " + this.getKmerSize());
+			System.out.println("kmer size: " + this.getK());
 			
 			while (fileIn.hasNextLine()) {
 				currentLine = fileIn.nextLine();
-
+				
 				if (currentLine.startsWith(">")) {
 					if (!read.toString().equals("")) {
-						addKmersToGraph(read.toString().toUpperCase());
+						breakReadIntoKmersAndAddToGraph(read.toString().toUpperCase());
 						readCount++;
 					}
 					read = new StringBuilder();
@@ -47,10 +47,9 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			}
 			
 			if (!read.toString().equals("")) {
-				addKmersToGraph(read.toString().toUpperCase());
+				breakReadIntoKmersAndAddToGraph(read.toString().toUpperCase());
 				readCount++;
 			}
-
 			System.out.println("Number of reads processed: " + readCount);
 		}
 		catch (FileNotFoundException e) {
@@ -60,35 +59,40 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 	
 	public void traverseGraphToGenerateContigs(String generatedContigsFile)
 	{
-		DirectedEdge unvisitedEdge;
+		DirectedEdge unvisitedEdge = null;
 		Node node;
 		BufferedWriter writer;
 		ExecutorService es;
 		boolean finished;
 		int noOfConcurrentThreads;
-		Iterator<Entry<String, Node>> iter;
-		
+		Iterator<Entry<String, Node>> nodeListMappingElements;
 		try {
 			writer = new BufferedWriter(new FileWriter(new File(generatedContigsFile)));
-			new WriterThread(writer, this.getKmerSize());
-			noOfConcurrentThreads = 4;
+			new WriterThread(writer, this.getK());
+			noOfConcurrentThreads = Runtime.getRuntime().availableProcessors();;
 			
 			System.out.println("Number of concurrent threads: "+noOfConcurrentThreads);
 			es = Executors.newFixedThreadPool(noOfConcurrentThreads);
 			
-			iter = nodeList.entrySet().iterator();
-	        while(iter.hasNext()) {
-	            node = iter.next().getValue();
+			//first loop through nodeListMappings to find unvisited edges from zero in-degree nodes
+			nodeListMappingElements = nodeList.entrySet().iterator();
+	        while(nodeListMappingElements.hasNext()) {
+	            node = nodeListMappingElements.next().getValue();
 	            if (node.getIndegree() == 0) {
-	            	unvisitedEdge = node.getUnvisitedEdge();
-	            	if (unvisitedEdge != null)
-	            		es.execute(new TraversalThread(unvisitedEdge));
+	            	while (true) {
+	            		unvisitedEdge = node.getUnvisitedEdge(unvisitedEdge);
+	            		if (unvisitedEdge != null)
+	            			es.execute(new TraversalThread(unvisitedEdge));
+	            		else
+	            			break;
+	            	}
 	            }
 	        }
 			
-	        iter = nodeList.entrySet().iterator();
-	        while(iter.hasNext()) {
-	            node = iter.next().getValue();
+	        //second loop through nodeListMappings to find remaining unvisited edges
+	        nodeListMappingElements = nodeList.entrySet().iterator();
+	        while(nodeListMappingElements.hasNext()) {
+	            node = nodeListMappingElements.next().getValue();
 	            unvisitedEdge = node.getUnvisitedEdge();
             	if (unvisitedEdge != null)
             		es.execute(new TraversalThread(unvisitedEdge));
@@ -97,7 +101,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			es.shutdown();
 			
 			try {
-				finished = es.awaitTermination(30, TimeUnit.MINUTES);
+				finished = es.awaitTermination(3, TimeUnit.MINUTES);
 				if(!finished)
 					System.err.println("ImprovedDeBruijnGraph:generateContigs: a traversal thread's timeout elapsed before finishing execution");
 			} catch (InterruptedException e) {

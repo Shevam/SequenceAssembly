@@ -1,26 +1,27 @@
 package graph.debruijn.improved;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.LinkedList;
 
 public class Node {
 
 	private String km1mer;
 	private int indegree, outdegree;
 	private boolean edgeListVisited;
-	public ConcurrentLinkedQueue<DirectedEdge> edgeList;
+	public LinkedList<DirectedEdge> edgeList;
 	
 	public Node(String km1mer) {
 		this.km1mer = km1mer;
 		this.indegree = 0;
 		this.outdegree = 0;
 		this.edgeListVisited = false;
-		this.edgeList = new ConcurrentLinkedQueue<DirectedEdge>();
+		this.edgeList = new LinkedList<DirectedEdge>();
 	}
 	
 	public String getKm1mer() { return km1mer; }
 	public void setKm1mer(String km1mer) { this.km1mer = km1mer; }
 	public void displayKm1mer() { System.out.println(km1mer); }
-
+	
 	public int getIndegree() { return this.indegree; }
 	public void incrementIndegree() { this.indegree++; }
 	
@@ -58,17 +59,40 @@ public class Node {
 		System.out.println(km1mer + " (" + indegree + ", " + outdegree + ")");
 	}
 	
-	public DirectedEdge getUnvisitedEdge() {
+	public synchronized DirectedEdge getUnvisitedEdge() {
 		DirectedEdge edge;
 		
 		if (edgeListVisited)
 			return null;
 		
-		for (Iterator<DirectedEdge> iter = edgeList.iterator(); iter.hasNext();) {
-			edge = iter.next();
+		Collections.shuffle(edgeList);
+		for (int i=0, n=edgeList.size(); i < n; i++) {
+			edge = edgeList.get(i);
 			if (!edge.isVisited())
 				return edge;
 		}
+		
+		edgeListVisited = true;
+		return null;
+	}
+	
+	public synchronized DirectedEdge getUnvisitedEdge(DirectedEdge exception) {
+		DirectedEdge edge;
+		
+		if (edgeListVisited)
+			return null;
+		
+		//Collections.shuffle(edgeList);
+		for (int i=0, n=edgeList.size(); i < n; i++) {
+			edge = edgeList.get(i);
+			if (!edge.isVisited()) {
+				if (edge == exception)
+					continue;
+				else
+					return edge;
+			}
+		}
+		
 		edgeListVisited = true;
 		return null;
 	}

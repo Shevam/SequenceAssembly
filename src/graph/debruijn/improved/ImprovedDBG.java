@@ -23,7 +23,7 @@ public abstract class ImprovedDBG implements IGraph {
 		return newNode;
 	}
 	
-	protected DirectedEdge addEdge(String prefixString, String suffixString) {
+	protected Node addEdge(String prefixString, String suffixString) {
 		Node prefixNode, suffixNode;
 
 		prefixNode = nodeList.get(prefixString);
@@ -33,11 +33,23 @@ public abstract class ImprovedDBG implements IGraph {
 		suffixNode = nodeList.get(suffixString);
 		if (suffixNode == null)
 			suffixNode = addNode(suffixString);
-
-		return prefixNode.addEdgeTo(suffixNode);
+		
+		prefixNode.addEdgeTo(suffixNode);
+		return suffixNode;
 	}
 	
-	protected int getKmerSize() { return this.kmerSize; }
+	protected Node addEdge(Node prefixNode, String suffixString) {
+		Node suffixNode;
+		
+		suffixNode = nodeList.get(suffixString);
+		if (suffixNode == null)
+			suffixNode = addNode(suffixString);
+		
+		prefixNode.addEdgeTo(suffixNode);
+		return suffixNode;
+	}
+	
+	protected int getK() { return this.kmerSize; }
 	protected void setKmerSize(int value) { this.kmerSize = value; }
 	
 	public void displayNodes() {
@@ -114,11 +126,17 @@ public abstract class ImprovedDBG implements IGraph {
     	return false;
     }
 	
-	protected void addKmersToGraph(String read) 
+	protected void breakReadIntoKmersAndAddToGraph(String read) 
 	{
-		int kmerSize = this.getKmerSize();
-		for (int i = 0; i < read.length() - kmerSize + 1; i++)
-			this.addEdge(read.substring(i, i + kmerSize - 1), read.substring(i + 1, i + kmerSize));
+		Node startingNode = null;
+		int k = this.getK();
+		
+		for (int i = 0; i < read.length() - k + 1; i++){
+			if (startingNode != null)
+				startingNode = this.addEdge(startingNode, read.substring(i + 1, i + k));
+			else
+				startingNode = this.addEdge(read.substring(i, i + k - 1), read.substring(i + 1, i + k));
+		}
 	}
 	
 	public abstract void constructGraph(File readsFile, int kmerSize);

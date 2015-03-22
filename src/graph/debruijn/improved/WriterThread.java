@@ -1,5 +1,4 @@
 package graph.debruijn.improved;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -8,8 +7,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class WriterThread extends Thread
 {
-	static BufferedWriter writer;
-	static int kmerSize;
+	private static BufferedWriter writer;
+	private static int kmerSize;
 	private static WriterThread instance = null;
 	private int contigCount;
 	public final BlockingQueue<LinkedList<DirectedEdge>> writerQueue;
@@ -24,35 +23,9 @@ public class WriterThread extends Thread
 		this.run();
 	}
 	
-	public static synchronized WriterThread getInstance()
-	{
-	    return instance;
-	}
+	public static synchronized WriterThread getInstance() { return instance; }
 	
-	public void addContigToWriterQueue(LinkedList<DirectedEdge> contig)
-	{
-		try {
-			this.writerQueue.put(contig);
-		} catch (InterruptedException e) {
-			System.err.println("writerThread interrupted while waiting to add to writerQueue");
-		}
-		this.run();
-	}
-	
-	public void run() 
-	{
-		LinkedList<DirectedEdge> contig;
-		super.run();
-		
-		while (true) {
-			contig = writerQueue.poll();
-			if(contig == null)
-				break;
-			
-			contigCount++;
-			printContigInFastaFormat(writer, contig, contigCount, kmerSize);
-		}
-	}
+	public int getContigCount() { return contigCount; }
 	
 	protected synchronized void printContigInFastaFormat(BufferedWriter writer, LinkedList<DirectedEdge> contigEdgeList, int contigCount, int kmerSize) 
 	{
@@ -92,8 +65,30 @@ public class WriterThread extends Thread
 		}
 	}
 	
-	public int getContigCount()
+	public void addContigToWriterQueue(LinkedList<DirectedEdge> contig)
 	{
-		return contigCount;
+		try { this.writerQueue.put(contig);
+		} catch (InterruptedException e) {
+			System.err.println("writerThread interrupted while waiting to add to writerQueue");
+		}
+		this.run();
+	}
+	
+	public void run() 
+	{
+		LinkedList<DirectedEdge> contig;
+		super.run();
+		
+		System.out.println("thread");
+		
+		while (true) {
+			contig = writerQueue.poll();
+			if(contig == null)
+				break;
+			
+			contigCount++;
+			printContigInFastaFormat(writer, contig, contigCount, kmerSize);
+		}
 	}
 }
+
