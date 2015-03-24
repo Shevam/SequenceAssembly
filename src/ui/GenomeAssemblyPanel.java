@@ -30,7 +30,6 @@ public class GenomeAssemblyPanel extends JPanel {
 	private JCheckBox chckbxDeBruijnGraph;
 	private JCheckBox chckbxOverlapGraph;
 	private JCheckBox chckbxGreedy;
-	private JCheckBox chckbxHybrid;
 	private JCheckBox chckbxImprovedDeBruijn;
 	private JLabel lblParameters;
 	private JLabel lblKForDBG;
@@ -123,9 +122,6 @@ public class GenomeAssemblyPanel extends JPanel {
 		chckbxGreedy = new JCheckBox("Greedy");
 		chckbxGreedy.setSelected(true);
 		
-		chckbxHybrid = new JCheckBox("Hybrid");
-		chckbxHybrid.setSelected(true);
-		
 		chckbxImprovedDeBruijn = new JCheckBox("Improved De Bruijn Graph");
 		chckbxImprovedDeBruijn.setSelected(true);
 		
@@ -163,10 +159,9 @@ public class GenomeAssemblyPanel extends JPanel {
 										.addComponent(lblKForDBG))
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addComponent(spnMinOverlapLen, GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
-										.addComponent(spnKForDBG, GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)))))
-						.addComponent(chckbxGreedy)
-						.addComponent(chckbxHybrid))
+										.addComponent(spnMinOverlapLen, GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+										.addComponent(spnKForDBG, GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)))))
+						.addComponent(chckbxGreedy))
 					.addContainerGap())
 		);
 		gl_panel.setVerticalGroup(
@@ -189,10 +184,8 @@ public class GenomeAssemblyPanel extends JPanel {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(chckbxGreedy)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(chckbxHybrid)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(chckbxImprovedDeBruijn)
-					.addContainerGap(12, Short.MAX_VALUE))
+					.addContainerGap(49, Short.MAX_VALUE))
 		);
 		panelForMethodsParams.setLayout(gl_panel);
 

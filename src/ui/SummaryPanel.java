@@ -110,7 +110,7 @@ public class SummaryPanel extends JPanel {
 			public void run() {
 				super.run();
 				while (!Main.isCompleted) {
-					try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+					try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
@@ -137,6 +137,8 @@ public class SummaryPanel extends JPanel {
 		barChart.setBarGap(2);
 		barChart.setVerticalGridLinesVisible(false);
 		barChart.setAnimated(false);
+		xAxis.setAnimated(false);
+		yAxis.setAnimated(false);
 		
 		Scene scene = new Scene(barChart, 800, 600);
 		observableList = FXCollections.observableArrayList(getGraphConstructionSeries(), getContigGenerationSeries());

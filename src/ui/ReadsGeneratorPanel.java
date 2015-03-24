@@ -90,8 +90,14 @@ public class ReadsGeneratorPanel extends JPanel {
 				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				fileChooser.setAcceptAllFileFilterUsed(false);
 				int browseForOutput = fileChooser.showSaveDialog(null);
+				String absolutePath = "";
 				if (browseForOutput == JFileChooser.APPROVE_OPTION) {
-					txtOutputReadsFile.setText(fileChooser.getSelectedFile().getAbsolutePath() + "\\generatedReads.fasta");
+					absolutePath = fileChooser.getSelectedFile().getAbsolutePath();
+					if (absolutePath.endsWith("\\")) {
+						txtOutputReadsFile.setText(fileChooser.getSelectedFile().getAbsolutePath() + "generatedReads.fasta");
+					} else {
+						txtOutputReadsFile.setText(fileChooser.getSelectedFile().getAbsolutePath() + "\\generatedReads.fasta");
+					}
 				} else if (browseForOutput == JFileChooser.ERROR_OPTION) {
 					JOptionPane.showMessageDialog(null, "Sorry! An error has occurred. Please select output directory again.");
 					txtOutputReadsFile.setText("");
