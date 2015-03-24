@@ -25,7 +25,7 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 			int readCount = 0;
 			
 			this.setK(k);
-			System.out.println("k-mer size: " + this.getK());
+			System.out.println("k: " + this.getK());
 			
 			while (fileIn.hasNextLine()) {
 				currentLine = fileIn.nextLine();
@@ -56,6 +56,7 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 		DirectedEdge unvisitedEdge;
 		BufferedWriter writer;
 		int contigCount = 0;
+		int longestContig = 0;
 		boolean newContigEdgeAdded;
 		try {
 			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
@@ -80,6 +81,9 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 								contigCount++;
 								printContigInFastaFormat(writer,contigEdgeList, contigCount, this.getK());
 								newContigEdgeAdded = false;
+								
+								if (longestContig < contigEdgeList.size()+this.getK()-1)
+									longestContig = contigEdgeList.size()+this.getK()-1;
 							}
 							contigEdgeList.removeLast();
 						}
@@ -88,6 +92,7 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 			}
 			writer.close();
 			System.out.println("Number of contigs generated: "+contigCount);
+			System.out.println("Longest contig length: " + longestContig);
 		}
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + outputFile);

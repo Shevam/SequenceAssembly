@@ -28,7 +28,7 @@ public class Main
 	
 	public static void main(String args[]) 
 	{
-		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.GREEDY, AssemblyMethods.OVERLAP };
+		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
 		
 		programStartTime = System.nanoTime();
 		isCompleted = false;
@@ -104,6 +104,7 @@ public class Main
 				System.out.println("Graph contruction and contigs generation skipped.");
 				break;
 			}
+			System.out.println();
 		}
 		
 		isCompleted = true;

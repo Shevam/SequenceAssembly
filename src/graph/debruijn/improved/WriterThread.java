@@ -12,12 +12,14 @@ public class WriterThread extends Thread
 	private static WriterThread instance = null;
 	private int contigCount;
 	public final BlockingQueue<LinkedList<DirectedEdge>> writerQueue;
+	public static int longestContig;
 	
 	public WriterThread(BufferedWriter w, int k)
 	{
 		writer = w;
 		kmerSize = k;
 		contigCount = 0;
+		longestContig = 0;
 		this.writerQueue = new LinkedBlockingQueue<LinkedList<DirectedEdge>>();
 		instance = this;
 		this.run();
@@ -76,18 +78,19 @@ public class WriterThread extends Thread
 	
 	public void run() 
 	{
-		LinkedList<DirectedEdge> contig;
+		LinkedList<DirectedEdge> contigEdgeList;
 		super.run();
 		
-		System.out.println("thread");
-		
 		while (true) {
-			contig = writerQueue.poll();
-			if(contig == null)
+			contigEdgeList = writerQueue.poll();
+			if(contigEdgeList == null)
 				break;
 			
 			contigCount++;
-			printContigInFastaFormat(writer, contig, contigCount, kmerSize);
+			printContigInFastaFormat(writer, contigEdgeList, contigCount, kmerSize);
+			
+			if (longestContig < contigEdgeList.size()+kmerSize-1)
+				longestContig = contigEdgeList.size()+kmerSize-1;
 		}
 	}
 }

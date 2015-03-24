@@ -63,7 +63,7 @@ public abstract class ImprovedDBG implements IGraph {
 	public void displayEdges() {
 		System.out.println("Edges: ");
 		for (Node node : nodeList.values()) {
-			for (DirectedEdge edge : node.edgeList) {
+			for (DirectedEdge edge : node.getEdgeList()) {
 				edge.print();
 			}
 		}
@@ -74,7 +74,7 @@ public abstract class ImprovedDBG implements IGraph {
 		System.out.println("Graph adjacency List:");
 		for (Node node : nodeList.values()) {
 			System.out.print(node.getKm1mer() + " --> ");
-			for (DirectedEdge edge : node.edgeList) {
+			for (DirectedEdge edge : node.getEdgeList()) {
 				System.out.print(edge.getEnd().getKm1mer() + "[" + edge.getWeight() + "], ");
 			}
 			System.out.println();

@@ -21,10 +21,8 @@ public class TraversalThread extends Thread
 		boolean edgeAdded;
 		DirectedEdge justVisitedEdge = null;
 		
-		contigEdgeList.add(startingEdge);
 		startingEdge.setVisited();
-		
-		System.err.println("thread");
+		contigEdgeList.add(startingEdge);
 		
 		edgeAdded = true;
 		while (!contigEdgeList.isEmpty()) {
@@ -34,15 +32,12 @@ public class TraversalThread extends Thread
 			unvisitedEdge = endNode.getUnvisitedEdge(justVisitedEdge);
 			
 			if (unvisitedEdge!=null) {
-				if (unvisitedEdge==justVisitedEdge)
-					continue;
 				unvisitedEdge.setVisited();
 				contigEdgeList.add(unvisitedEdge);
 				edgeAdded = true;
 			}
 			else {
 				if(edgeAdded) {
-					System.err.println("contig");
 					WriterThread.getInstance().addContigToWriterQueue((LinkedList<DirectedEdge>) contigEdgeList.clone());
 					edgeAdded = false;
 				}

@@ -1,5 +1,4 @@
 package graph.debruijn.improved;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -8,7 +7,7 @@ public class Node {
 	private String km1mer;
 	private int indegree, outdegree;
 	private boolean edgeListVisited;
-	public LinkedList<DirectedEdge> edgeList;
+	private LinkedList<DirectedEdge> edgeList;
 	
 	public Node(String km1mer) {
 		this.km1mer = km1mer;
@@ -30,6 +29,8 @@ public class Node {
 	
 	public boolean isBalanced() { return (indegree == outdegree); }
 	public boolean isSemiBalanced() { return (Math.abs(indegree - outdegree) == 1); }
+	
+	public LinkedList<DirectedEdge> getEdgeList() { return edgeList; }
 	
 	public DirectedEdge addEdgeTo(Node endNode) {
 		DirectedEdge newEdge, currentEdge;
@@ -65,7 +66,7 @@ public class Node {
 		if (edgeListVisited)
 			return null;
 		
-		Collections.shuffle(edgeList);
+		//Collections.shuffle(edgeList);
 		for (int i=0, n=edgeList.size(); i < n; i++) {
 			edge = edgeList.get(i);
 			if (!edge.isVisited())
@@ -92,6 +93,10 @@ public class Node {
 					return edge;
 			}
 		}
+		
+		if (exception!=null)
+			if(!exception.isVisited())
+				return exception;
 		
 		edgeListVisited = true;
 		return null;

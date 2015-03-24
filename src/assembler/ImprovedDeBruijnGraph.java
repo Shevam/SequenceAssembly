@@ -30,7 +30,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			int readCount = 0;
 			
 			this.setKmerSize(kmerSize);
-			System.out.println("kmer size: " + this.getK());
+			System.out.println("k: " + this.getK());
 			
 			while (fileIn.hasNextLine()) {
 				currentLine = fileIn.nextLine();
@@ -69,23 +69,21 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 		try {
 			writer = new BufferedWriter(new FileWriter(new File(generatedContigsFile)));
 			new WriterThread(writer, this.getK());
-			noOfConcurrentThreads = Runtime.getRuntime().availableProcessors();;
+			//noOfConcurrentThreads = Runtime.getRuntime().availableProcessors();
+			noOfConcurrentThreads = 1;
 			
 			System.out.println("Number of concurrent threads: "+noOfConcurrentThreads);
 			es = Executors.newFixedThreadPool(noOfConcurrentThreads);
 			
 			//first loop through nodeListMappings to find unvisited edges from zero in-degree nodes
 			nodeListMappingElements = nodeList.entrySet().iterator();
+			
 	        while(nodeListMappingElements.hasNext()) {
 	            node = nodeListMappingElements.next().getValue();
 	            if (node.getIndegree() == 0) {
-	            	while (true) {
-	            		unvisitedEdge = node.getUnvisitedEdge(unvisitedEdge);
-	            		if (unvisitedEdge != null)
-	            			es.execute(new TraversalThread(unvisitedEdge));
-	            		else
-	            			break;
-	            	}
+	            	for (DirectedEdge edge : node.getEdgeList())
+	            		if (!edge.isVisited())
+	            			es.execute(new TraversalThread(edge));
 	            }
 	        }
 			
@@ -99,7 +97,6 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 	        }
 	        
 			es.shutdown();
-			
 			try {
 				finished = es.awaitTermination(3, TimeUnit.MINUTES);
 				if(!finished)
@@ -109,6 +106,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			}
 			
 			System.out.println("Number of contigs generated: " + WriterThread.getInstance().getContigCount());
+			System.out.println("Longest contig length: " + WriterThread.longestContig);
 			writer.close();
 		} catch (IOException e) {
 			System.err.println("ImprovedDeBruijnGraph:generateContigs: file "+generatedContigsFile+" cannot be created or opened");
