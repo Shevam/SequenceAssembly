@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ImprovedDBG implements IGraph {
 	protected ConcurrentHashMap<String, Node> nodeList;
-	protected int kmerSize;
+	protected int k;
 	
 	protected ImprovedDBG() {
 		super();
@@ -49,8 +49,8 @@ public abstract class ImprovedDBG implements IGraph {
 		return suffixNode;
 	}
 	
-	protected int getK() { return this.kmerSize; }
-	protected void setKmerSize(int value) { this.kmerSize = value; }
+	protected int getK() { return this.k; }
+	protected void setKmerSize(int value) { this.k = value; }
 	
 	public void displayNodes() {
 		System.out.println("Nodes (indeg, outdeg): ");

@@ -83,18 +83,15 @@ public class Node {
 		if (edgeListVisited)
 			return null;
 		
-		//Collections.shuffle(edgeList);
 		for (int i=0, n=edgeList.size(); i < n; i++) {
 			edge = edgeList.get(i);
 			if (!edge.isVisited()) {
-				if (edge == exception)
-					continue;
-				else
+				if (edge != exception)
 					return edge;
 			}
 		}
 		
-		if (exception!=null)
+		if (exception != null)
 			if(!exception.isVisited())
 				return exception;
 		

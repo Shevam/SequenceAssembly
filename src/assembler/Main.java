@@ -1,7 +1,7 @@
 package assembler;
 import java.io.File;
 
-public class Main 
+public class Main
 {
 	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, GREEDY,IMPROVED_DE_BRUIJN; };
 	
@@ -9,7 +9,7 @@ public class Main
 	static final String READS_FILE_NAME = "generatedReads.fasta";
 	static final String GENERATED_CONTIGS_FILE = "generatedContigs.fasta";
 	static final int MINIMUM_OVERLAP_LENGTH = 10;
-	static final int KMER_SIZE = 41;
+	static final int KMER_SIZE = 11;
 	
 	static long programStartTime, programEndTime;
 	static AssemblyMethods assemblyMethods[];
@@ -28,6 +28,8 @@ public class Main
 	
 	public static void main(String args[]) 
 	{
+		//System.out.println(new ReadsGenerator().generateReads(SEQUENCE_FILE, 460, MINIMUM_OVERLAP_LENGTH, READS_FILE_NAME));
+		
 		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
 		
 		programStartTime = System.nanoTime();
@@ -44,7 +46,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (dbgGraphConstructionEndTime - dbgGraphConstructionStartTime) / 1000000);
 				
 				dbgContigGenerationStartTime = System.nanoTime();
-				dbg.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
+				//dbg.traverseGraphToGenerateContigs("dBGGeneratedContigs.fasta");
 				dbgContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (dbgContigGenerationEndTime - dbgContigGenerationStartTime) / 1000000);
 				
@@ -91,9 +93,9 @@ public class Main
 				idbg.constructGraph(new File(READS_FILE_NAME), KMER_SIZE);
 				impDbgGraphConstructionEndTime = System.nanoTime();
 				System.out.println("Time to construct graph(ms): " + (impDbgGraphConstructionEndTime - impDbgGraphConstructionStartTime) / 1000000);
-				//DeBruijnGraph.getInstance().displayGraph();
+				
 				impDbgContigGenerationStartTime = System.nanoTime();
-				idbg.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
+				//idbg.traverseGraphToGenerateContigs("improvedDBGGeneratedContigs.fasta");
 				impDbgContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (impDbgContigGenerationEndTime - impDbgContigGenerationStartTime) / 1000000);
 				idbg = null;

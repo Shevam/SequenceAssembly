@@ -22,15 +22,15 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 		super();
 	}
 	
-	public void constructGraph(File readsFile, int kmerSize) 
+	public void constructGraph(File readsFile, int k) 
 	{
 		try (Scanner fileIn = new Scanner(readsFile)) {
 			String currentLine = "";
 			StringBuilder read = new StringBuilder();
 			int readCount = 0;
 			
-			this.setKmerSize(kmerSize);
-			System.out.println("k: " + this.getK());
+			this.setKmerSize(k);
+			System.out.println("k: " + k);
 			
 			while (fileIn.hasNextLine()) {
 				currentLine = fileIn.nextLine();
@@ -50,6 +50,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 				breakReadIntoKmersAndAddToGraph(read.toString().toUpperCase());
 				readCount++;
 			}
+			
 			System.out.println("Number of reads processed: " + readCount);
 		}
 		catch (FileNotFoundException e) {
@@ -70,7 +71,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			writer = new BufferedWriter(new FileWriter(new File(generatedContigsFile)));
 			new WriterThread(writer, this.getK());
 			//noOfConcurrentThreads = Runtime.getRuntime().availableProcessors();
-			noOfConcurrentThreads = 1;
+			noOfConcurrentThreads = 4;
 			
 			System.out.println("Number of concurrent threads: "+noOfConcurrentThreads);
 			es = Executors.newFixedThreadPool(noOfConcurrentThreads);
@@ -98,7 +99,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 	        
 			es.shutdown();
 			try {
-				finished = es.awaitTermination(3, TimeUnit.MINUTES);
+				finished = es.awaitTermination(5, TimeUnit.MINUTES);
 				if(!finished)
 					System.err.println("ImprovedDeBruijnGraph:generateContigs: a traversal thread's timeout elapsed before finishing execution");
 			} catch (InterruptedException e) {

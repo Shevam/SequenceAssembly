@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class ReadsGenerator
 {	
-	public static String generateReads(String sequenceFile, int readSize, int minOverlapLength,String readsFile)
+	public String generateReads(String sequenceFile, int readSize, int minOverlapLength,String readsFile)
 	{
 		String sequence;
 		
