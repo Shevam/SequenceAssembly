@@ -6,6 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -14,6 +15,9 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EtchedBorder;
+
+import assembler.Main;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -70,6 +74,37 @@ public class GenomeAssemblyPanel extends JPanel {
 		});
 	
 		btnStartAssembly = new JButton("Start Assembly");
+		btnStartAssembly.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (txtReadsFile.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "Reads file left blank.", "No file selected", JOptionPane.ERROR_MESSAGE);
+					return;
+				} else {
+					Main.setReadsFile(txtReadsFile.getText());
+				}
+				if (chckbxDeBruijnGraph.isSelected()) {
+					Main.addAssemblyMethod(Main.AssemblyMethods.DE_BRUIJN);
+				}
+				if (chckbxOverlapGraph.isSelected()) {
+					Main.addAssemblyMethod(Main.AssemblyMethods.OVERLAP);
+				}
+				if (chckbxGreedy.isSelected()) {
+					Main.addAssemblyMethod(Main.AssemblyMethods.GREEDY);
+				}
+				if (chckbxImprovedDeBruijn.isSelected()) {
+					Main.addAssemblyMethod(Main.AssemblyMethods.IMPROVED_DE_BRUIJN);
+				}
+				if (Main.getNoOfAssemblyMethods() == 0) {
+					JOptionPane.showMessageDialog(null, "Please choose at least one assembly method.");
+					return;
+				}
+				Main.setK((int) spnKForDBG.getValue());
+				Main.setMinimumOverlapLength((int) spnMinOverlapLen.getValue());
+				Main.resetTime();
+				tabbedPane.setSelectedIndex(MainFrame.SummaryTabIndex);
+				SummaryPanel.startAssembly();
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)

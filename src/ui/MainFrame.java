@@ -49,16 +49,4 @@ public class MainFrame extends JFrame {
 		
 		this.setVisible(true);
 	}
-
-//	private class ReadsGeneratorPanel extends JPanel {
-//	
-//	}
-//	
-//	private class GenomeAssemblyPanel extends JPanel {
-//	
-//	}
-//	
-//	private class SummaryPanel extends JPanel {
-//	
-//	}
 }

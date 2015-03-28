@@ -1,18 +1,19 @@
 package assembler;
 import java.io.File;
+import java.util.ArrayList;
 
 public class Main
 {
 	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, GREEDY,IMPROVED_DE_BRUIJN; };
 	
-	static final String SEQUENCE_FILE = "BorreliaFull_CompleteSequence.fasta";
-	static final String READS_FILE_NAME = "generatedReads.fasta";
-	static final String GENERATED_CONTIGS_FILE = "generatedContigs.fasta";
-	static final int MINIMUM_OVERLAP_LENGTH = 10;
-	static final int KMER_SIZE = 11;
+	static String SEQUENCE_FILE = "BorreliaFull_CompleteSequence.fasta";
+	static String READS_FILE_NAME = "generatedReads.fasta";
+	static String GENERATED_CONTIGS_FILE = "generatedContigs.fasta";
+	static int MINIMUM_OVERLAP_LENGTH = 10;
+	static int K = 11;
 	
 	static long programStartTime, programEndTime;
-	static AssemblyMethods assemblyMethods[];
+	static ArrayList<AssemblyMethods> assemblyMethods = new ArrayList<AssemblyMethods>();
 	
 	static long dbgGraphConstructionStartTime = 0, dbgGraphConstructionEndTime = 0;
 	static long overlapGraphConstructionStartTime = 0, overlapGraphConstructionEndTime = 0;
@@ -27,11 +28,7 @@ public class Main
 	public static boolean isCompleted = false;
 	
 	public static void main(String args[]) 
-	{
-		//System.out.println(new ReadsGenerator().generateReads(SEQUENCE_FILE, 460, MINIMUM_OVERLAP_LENGTH, READS_FILE_NAME));
-		
-		assemblyMethods = new AssemblyMethods[] { AssemblyMethods.DE_BRUIJN, AssemblyMethods.IMPROVED_DE_BRUIJN };
-		
+	{				
 		programStartTime = System.nanoTime();
 		isCompleted = false;
 		for (AssemblyMethods method : assemblyMethods) {
@@ -41,7 +38,7 @@ public class Main
 				
 				dbgGraphConstructionStartTime = System.nanoTime();
 				TypicalDeBruijnGraph dbg = new TypicalDeBruijnGraph();
-				dbg.constructGraph(new File(READS_FILE_NAME), KMER_SIZE);
+				dbg.constructGraph(new File(READS_FILE_NAME), K);
 				dbgGraphConstructionEndTime = System.nanoTime();
 				System.out.println("Time to construct graph(ms): " + (dbgGraphConstructionEndTime - dbgGraphConstructionStartTime) / 1000000);
 				
@@ -90,7 +87,7 @@ public class Main
 				System.out.println("Method: ImprovedDeBruijnGraph");
 				impDbgGraphConstructionStartTime = System.nanoTime();
 				ImprovedDeBruijnGraph idbg = new ImprovedDeBruijnGraph();
-				idbg.constructGraph(new File(READS_FILE_NAME), KMER_SIZE);
+				idbg.constructGraph(new File(READS_FILE_NAME), K);
 				impDbgGraphConstructionEndTime = System.nanoTime();
 				System.out.println("Time to construct graph(ms): " + (impDbgGraphConstructionEndTime - impDbgGraphConstructionStartTime) / 1000000);
 				
@@ -112,6 +109,50 @@ public class Main
 		isCompleted = true;
 		programEndTime = System.nanoTime();
 		System.out.println("Program execution time(ms): " + (programEndTime - programStartTime) / 1000000);
+	}
+	
+	public static void setReadsFile(String filePath) { // TODO: requires possible changes to other codes!
+		READS_FILE_NAME = filePath;
+	}
+	
+	public static void addAssemblyMethod(AssemblyMethods newMethod) {
+		if (!assemblyMethods.contains(newMethod)) {
+			assemblyMethods.add(newMethod);
+		}
+	}
+	
+	public static void setK(int k) {
+		K = k;
+	}
+	
+	public static void setMinimumOverlapLength(int mol) {
+		MINIMUM_OVERLAP_LENGTH = mol;
+	}
+	
+	public static int getNoOfAssemblyMethods() {
+		return assemblyMethods.size();
+	}
+	
+	public static void resetTime() {
+		dbgGraphConstructionStartTime = 0;
+		dbgGraphConstructionEndTime = 0;
+		dbgContigGenerationStartTime = 0;
+		dbgContigGenerationEndTime = 0;
+		
+		overlapGraphConstructionStartTime = 0;
+		overlapGraphConstructionEndTime = 0;
+		overlapContigGenerationStartTime = 0;
+		overlapContigGenerationEndTime = 0;
+		
+		greedyGraphConstructionStartTime = 0;
+		greedyGraphConstructionEndTime = 0;
+		greedyContigGenerationStartTime = 0;
+		greedyContigGenerationEndTime = 0;
+		
+		impDbgGraphConstructionStartTime = 0;
+		impDbgGraphConstructionEndTime = 0;
+		impDbgContigGenerationStartTime = 0;
+		impDbgContigGenerationEndTime = 0;
 	}
 	
 	public static long getGraphConstructionRunTime(AssemblyMethods assemblyMethod) {

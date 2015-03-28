@@ -49,16 +49,10 @@ public class SummaryPanel extends JPanel {
 			}
 		});
 		
-		btnPrevious = new JButton("Run!"); // TODO: Rename to Previous
+		btnPrevious = new JButton("Previous");
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//tabbedPane.setSelectedIndex(MainFrame.GenomeAssemblerTabIndex);
-				new Thread() {
-					public void run() {
-						startMonitoring();
-						Main.main(new String[0]);				
-					};
-				}.start();
+				tabbedPane.setSelectedIndex(MainFrame.GenomeAssemblerTabIndex);
 			}
 		});
 
@@ -102,6 +96,16 @@ public class SummaryPanel extends JPanel {
 		// This method is invoked on the JavaFX thread
 		Scene scene = createScene();
 		fxPanel.setScene(scene);
+	}
+	
+	public static void startAssembly() {
+		new Thread() {
+			public void run() {
+				startMonitoring();
+				this.setPriority(Thread.MAX_PRIORITY);
+				Main.main(new String[0]);
+			};
+		}.start();
 	}
 	
 	private static void startMonitoring() {

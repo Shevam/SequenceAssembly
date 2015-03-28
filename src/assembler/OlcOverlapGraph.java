@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 public class OlcOverlapGraph extends OverlapGraph implements IGraph {
 	public OlcOverlapGraph(int minimumOverlapLength) {
 		super(minimumOverlapLength);
@@ -46,6 +48,7 @@ public class OlcOverlapGraph extends OverlapGraph implements IGraph {
 			System.out.println("Number of reads processed: " + readCount);
 		}
 		catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File " + readsFile.getAbsolutePath() + " not found.");
 			System.err.println("File not found: " + readsFile);
 		}
 	}

@@ -205,6 +205,23 @@ public abstract class OverlapGraph implements IGraph {
 			System.err.println("OverlapGraph:printContigInFastaFormat: error while writing to file");
 		}
 	}
+
+	public void displayGraph() {
+		System.out.println("Graph adjacency List:");
+		LinkedList<DirectedEdge> edgeList;
+		for (Node node : nodeList.values()) {
+			System.out.print(node.getRead() + " --> ");
+			edgeList = adjacencyList.get(node);
+			if (edgeList!=null) {
+				for (DirectedEdge edge : edgeList) {
+					if (edge!=null)
+						System.out.print(edge.getEnd().getRead() + "[" + edge.getOverlapLength() + "], ");
+				}
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
 	
 	public abstract void constructGraph(File readsFile, int minimumOverlapLength);
 	public abstract void traverseGraphToGenerateContigs(String outputFile);

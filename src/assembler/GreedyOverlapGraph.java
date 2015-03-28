@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
 	public GreedyOverlapGraph(int minimumOverlapLength) {
 		super(minimumOverlapLength);
@@ -44,6 +46,7 @@ public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
 			System.out.println("Number of reads processed: " + readCount);
 		}
 		catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File " + readsFile.getAbsolutePath() + " not found.");
 			System.err.println("File not found: " + readsFile);
 		}
 	}

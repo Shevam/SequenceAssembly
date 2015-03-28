@@ -71,7 +71,7 @@ public class ReadsGeneratorPanel extends JPanel {
 		lblReadSize = new JLabel("Read Size");
 		
 		spnReadSize = new JSpinner();
-		spnReadSize.setModel(new SpinnerNumberModel(new Integer(200), new Integer(0), null, new Integer(1)));
+		spnReadSize.setModel(new SpinnerNumberModel(new Integer(200), new Integer(1), null, new Integer(1)));
 
 		lblMinimumOverlapLength = new JLabel("Minimum Overlap Length");
 		

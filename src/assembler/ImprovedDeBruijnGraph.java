@@ -14,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JOptionPane;
+
 import graph.debruijn.improved.*;
 
 public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
@@ -54,6 +56,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			System.out.println("Number of reads processed: " + readCount);
 		}
 		catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File " + readsFile.getAbsolutePath() + " not found.");
 			System.err.println("File not found: " + readsFile);
 		}
 	}
