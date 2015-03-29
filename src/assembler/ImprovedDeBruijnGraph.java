@@ -85,7 +85,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 	        while(nodeListMappingElements.hasNext()) {
 	            node = nodeListMappingElements.next().getValue();
 	            if (node.getIndegree() == 0) {
-	            	for (DirectedEdge edge : node.getEdgeList())
+	            	for (DirectedEdge edge : node.getOutgoingEdgeList())
 	            		if (!edge.isVisited())
 	            			es.execute(new TraversalThread(edge));
 	            }
@@ -95,7 +95,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 	        nodeListMappingElements = nodeList.entrySet().iterator();
 	        while(nodeListMappingElements.hasNext()) {
 	            node = nodeListMappingElements.next().getValue();
-	            unvisitedEdge = node.getUnvisitedEdge();
+	            unvisitedEdge = node.getUnvisitedOutgoingEdge();
             	if (unvisitedEdge != null)
             		es.execute(new TraversalThread(unvisitedEdge));
 	        }

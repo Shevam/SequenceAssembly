@@ -10,7 +10,7 @@ public class Main
 	static String READS_FILE_NAME = "generatedReads.fasta";
 	static String GENERATED_CONTIGS_FILE = "generatedContigs.fasta";
 	static int MINIMUM_OVERLAP_LENGTH = 10;
-	static int K = 11;
+	static int K = 41;
 	
 	static long programStartTime, programEndTime;
 	static ArrayList<AssemblyMethods> assemblyMethods = new ArrayList<AssemblyMethods>();
@@ -28,7 +28,10 @@ public class Main
 	public static boolean isCompleted = false;
 	
 	public static void main(String args[]) 
-	{				
+	{
+		//addAssemblyMethod(AssemblyMethods.DE_BRUIJN);
+		addAssemblyMethod(AssemblyMethods.IMPROVED_DE_BRUIJN);
+		
 		programStartTime = System.nanoTime();
 		isCompleted = false;
 		for (AssemblyMethods method : assemblyMethods) {
@@ -43,7 +46,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (dbgGraphConstructionEndTime - dbgGraphConstructionStartTime) / 1000000);
 				
 				dbgContigGenerationStartTime = System.nanoTime();
-				//dbg.traverseGraphToGenerateContigs("dBGGeneratedContigs.fasta");
+				dbg.traverseGraphToGenerateContigs("dBGGeneratedContigs.fasta");
 				dbgContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (dbgContigGenerationEndTime - dbgContigGenerationStartTime) / 1000000);
 				
@@ -92,7 +95,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (impDbgGraphConstructionEndTime - impDbgGraphConstructionStartTime) / 1000000);
 				
 				impDbgContigGenerationStartTime = System.nanoTime();
-				//idbg.traverseGraphToGenerateContigs("improvedDBGGeneratedContigs.fasta");
+				idbg.traverseGraphToGenerateContigs("improvedDBGGeneratedContigs.fasta");
 				impDbgContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (impDbgContigGenerationEndTime - impDbgContigGenerationStartTime) / 1000000);
 				idbg = null;

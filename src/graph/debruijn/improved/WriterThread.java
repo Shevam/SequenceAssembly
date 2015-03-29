@@ -36,19 +36,19 @@ public class WriterThread extends Thread
 		fastaLineLength = ImprovedDBG.fastaLineLength;
 		try {
 			writer.write(">c" + contigCount + "_EdgeCount_"+ contigEdgeList.size() +"\n");
-			writer.write(contigEdgeList.getFirst().getKmer());
+			writer.write(contigEdgeList.getFirst().getStart().getKm1mer());
 			
-			writerRemainingLineSpace = fastaLineLength - contigEdgeList.getFirst().getKmer().length();
+			writerRemainingLineSpace = fastaLineLength - contigEdgeList.getFirst().getStart().getKm1mer().length();
 			
 			if (contigEdgeList.size()-1 > writerRemainingLineSpace) {
 				for(int i=1; i<=writerRemainingLineSpace; i++)
-					writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(kmerSize-2));
+					writer.write(contigEdgeList.get(i).getValue());
 				writer.newLine();
 				
 				counter=0;
 				for(int i=writerRemainingLineSpace+1; i<contigEdgeList.size(); i++)
 				{
-					writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(kmerSize-2));
+					writer.write(contigEdgeList.get(i).getValue());
 					counter++;
 					if(counter % fastaLineLength == 0)
 						writer.newLine();
@@ -56,7 +56,7 @@ public class WriterThread extends Thread
 			}
 			else {
 				for(int i=1; i<contigEdgeList.size(); i++)
-					writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(kmerSize-2));
+					writer.write(contigEdgeList.get(i).getValue());
 			}
 			
 			writer.write("\n");
@@ -87,7 +87,8 @@ public class WriterThread extends Thread
 				break;
 			
 			contigCount++;
-			printContigInFastaFormat(writer, contigEdgeList, contigCount, kmerSize);
+			if (contigEdgeList.size()>1)
+				printContigInFastaFormat(writer, contigEdgeList, contigCount, kmerSize);
 			
 			if (longestContig < contigEdgeList.size()+kmerSize-1)
 				longestContig = contigEdgeList.size()+kmerSize-1;

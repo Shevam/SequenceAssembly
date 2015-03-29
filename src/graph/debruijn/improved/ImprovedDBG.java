@@ -38,15 +38,15 @@ public abstract class ImprovedDBG implements IGraph {
 		return suffixNode;
 	}
 	
-	protected Node addEdge(Node prefixNode, String suffixString) {
-		Node suffixNode;
+	protected Node addEdge(Node startingNode, String suffixString) {
+		Node endingNode;
 		
-		suffixNode = nodeList.get(suffixString);
-		if (suffixNode == null)
-			suffixNode = addNode(suffixString);
+		endingNode = nodeList.get(suffixString);
+		if (endingNode == null)
+			endingNode = addNode(suffixString);
 		
-		prefixNode.addEdgeTo(suffixNode);
-		return suffixNode;
+		endingNode.addIncomingEdge(startingNode.addEdgeTo(endingNode));
+		return endingNode;
 	}
 	
 	protected int getK() { return this.k; }
@@ -63,7 +63,7 @@ public abstract class ImprovedDBG implements IGraph {
 	public void displayEdges() {
 		System.out.println("Edges: ");
 		for (Node node : nodeList.values()) {
-			for (DirectedEdge edge : node.getEdgeList()) {
+			for (DirectedEdge edge : node.getOutgoingEdgeList()) {
 				edge.print();
 			}
 		}
@@ -74,7 +74,7 @@ public abstract class ImprovedDBG implements IGraph {
 		System.out.println("Graph adjacency List:");
 		for (Node node : nodeList.values()) {
 			System.out.print(node.getKm1mer() + " --> ");
-			for (DirectedEdge edge : node.getEdgeList()) {
+			for (DirectedEdge edge : node.getOutgoingEdgeList()) {
 				System.out.print(edge.getEnd().getKm1mer() + "[" + edge.getWeight() + "], ");
 			}
 			System.out.println();
@@ -86,7 +86,7 @@ public abstract class ImprovedDBG implements IGraph {
 		Iterator<Entry<String, Node>> iter = nodeList.entrySet().iterator();
         DirectedEdge edge;
         while(iter.hasNext()) {
-            edge = iter.next().getValue().getUnvisitedEdge();
+            edge = iter.next().getValue().getUnvisitedOutgoingEdge();
             if (edge != null)
             	return edge;
         }
@@ -100,7 +100,7 @@ public abstract class ImprovedDBG implements IGraph {
         while(iter.hasNext()) {
             node = iter.next().getValue();
             if (node.getIndegree() == 0) {
-            	edge = node.getUnvisitedEdge();
+            	edge = node.getUnvisitedOutgoingEdge();
             	if (edge != null)
             		return edge;
             }

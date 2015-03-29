@@ -122,7 +122,7 @@ public abstract class DeBruijnGraph implements IGraph {
 				counter=0;
 				for(int i=writerRemainingLineSpace+1; i<contigEdgeList.size(); i++)
 				{
-					writer.write(contigEdgeList.get(i).getEnd().getKm1mer().charAt(kmerSize-2));
+					writer.write(contigEdgeList.get(i).getKmer().charAt(kmerSize-1));
 					counter++;
 					if(counter % fastaLineLength == 0)
 						writer.newLine();

@@ -73,6 +73,7 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 					unvisitedEdge.setVisited();
 					newContigEdgeAdded = true;
 					while (!contigEdgeList.isEmpty()) {
+						System.out.print(".");
 						unvisitedEdge = this.getUnvisitedEdge(contigEdgeList.getLast().getEnd());
 						if (unvisitedEdge!=null) {
 							unvisitedEdge.setVisited();

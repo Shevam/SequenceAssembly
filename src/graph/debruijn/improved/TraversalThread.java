@@ -1,5 +1,6 @@
 package graph.debruijn.improved;
 import java.util.LinkedList;
+import java.util.Stack;
 
 public class TraversalThread extends Thread
 {
@@ -20,8 +21,14 @@ public class TraversalThread extends Thread
 		DirectedEdge unvisitedEdge;
 		boolean edgeAdded;
 		DirectedEdge justVisitedEdge = null;
+		Stack<DirectedEdge> backTraversalEdgeList;
 		
 		startingEdge.setVisited();
+		
+		backTraversalEdgeList = backTraverseGraph(startingEdge);
+		while(!backTraversalEdgeList.isEmpty())
+			contigEdgeList.add(backTraversalEdgeList.pop());
+		
 		contigEdgeList.add(startingEdge);
 		
 		edgeAdded = true;
@@ -29,7 +36,7 @@ public class TraversalThread extends Thread
 			unvisitedEdge = contigEdgeList.getLast();
 			
 			endNode = unvisitedEdge.getEnd();
-			unvisitedEdge = endNode.getUnvisitedEdge(justVisitedEdge);
+			unvisitedEdge = endNode.getUnvisitedOutgoingEdge(justVisitedEdge);
 			
 			if (unvisitedEdge!=null) {
 				unvisitedEdge.setVisited();
@@ -43,6 +50,20 @@ public class TraversalThread extends Thread
 				}
 				justVisitedEdge = contigEdgeList.removeLast();
 			}
+		}
+	}
+
+	private Stack<DirectedEdge> backTraverseGraph(DirectedEdge currentEdge) {
+		Stack<DirectedEdge> backTraversalEdgeList = new Stack<DirectedEdge>();
+		
+		while (true) {
+			currentEdge = currentEdge.getStart().getUnvisitedIncomingEdge();
+			if(currentEdge != null) {
+				currentEdge.setVisited();
+				backTraversalEdgeList.push(currentEdge);
+			}
+			else
+				return backTraversalEdgeList;
 		}
 	}
 }
