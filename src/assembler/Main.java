@@ -6,9 +6,9 @@ public class Main
 {
 	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, GREEDY,IMPROVED_DE_BRUIJN; };
 	
-	static String SEQUENCE_FILE = "BorreliaFull_CompleteSequence.fasta";
-	static String READS_FILE_NAME = "generatedReads.fasta";
-	static String GENERATED_CONTIGS_FILE = "generatedContigs.fasta";
+	static String SEQUENCE_FILE;// = "BorreliaFull_CompleteSequence.fasta";
+	static String READS_FILE_NAME;// = "generatedReads.fasta";
+	static String GENERATED_CONTIGS_FILE_LOCATION;// = "generatedContigs.fasta";
 	static int MINIMUM_OVERLAP_LENGTH = 10;
 	static int K = 41;
 	
@@ -30,7 +30,7 @@ public class Main
 	public static void main(String args[]) 
 	{
 		//addAssemblyMethod(AssemblyMethods.DE_BRUIJN);
-		addAssemblyMethod(AssemblyMethods.IMPROVED_DE_BRUIJN);
+		//addAssemblyMethod(AssemblyMethods.IMPROVED_DE_BRUIJN);
 		
 		programStartTime = System.nanoTime();
 		isCompleted = false;
@@ -46,7 +46,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (dbgGraphConstructionEndTime - dbgGraphConstructionStartTime) / 1000000);
 				
 				dbgContigGenerationStartTime = System.nanoTime();
-				dbg.traverseGraphToGenerateContigs("dBGGeneratedContigs.fasta");
+				dbg.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE_LOCATION + "DBG_GeneratedContigs.fasta");
 				dbgContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (dbgContigGenerationEndTime - dbgContigGenerationStartTime) / 1000000);
 				
@@ -63,7 +63,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (overlapGraphConstructionEndTime - overlapGraphConstructionStartTime) / 1000000);
 				
 				overlapContigGenerationStartTime = System.nanoTime();
-				oog.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
+				oog.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE_LOCATION + "OLC_GeneratedContigs.fasta");
 				overlapContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (overlapContigGenerationEndTime - overlapContigGenerationStartTime) / 1000000);
 				oog = null;
@@ -79,7 +79,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (greedyGraphConstructionEndTime - greedyGraphConstructionStartTime) / 1000000);
 				
 				greedyContigGenerationStartTime = System.nanoTime();
-				gog.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE);
+				gog.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE_LOCATION + "GREEDY_GeneratedContigs.fasta");
 				greedyContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (greedyContigGenerationEndTime - greedyContigGenerationStartTime) / 1000000);
 				gog = null;
@@ -95,7 +95,7 @@ public class Main
 				System.out.println("Time to construct graph(ms): " + (impDbgGraphConstructionEndTime - impDbgGraphConstructionStartTime) / 1000000);
 				
 				impDbgContigGenerationStartTime = System.nanoTime();
-				idbg.traverseGraphToGenerateContigs("improvedDBGGeneratedContigs.fasta");
+				idbg.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE_LOCATION + "ImprovedDBG_GeneratedContigs.fasta");
 				impDbgContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (impDbgContigGenerationEndTime - impDbgContigGenerationStartTime) / 1000000);
 				idbg = null;
@@ -116,6 +116,10 @@ public class Main
 	
 	public static void setReadsFile(String filePath) { // TODO: requires possible changes to other codes!
 		READS_FILE_NAME = filePath;
+	}
+	
+	public static void setContigsFileLocation(String filePath) {
+		GENERATED_CONTIGS_FILE_LOCATION = filePath;
 	}
 	
 	public static void addAssemblyMethod(AssemblyMethods newMethod) {

@@ -1,9 +1,13 @@
 package ui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -15,19 +19,20 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EtchedBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import assembler.Main;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
 public class GenomeAssemblyPanel extends JPanel {
 	private static final long serialVersionUID = 2L;
-	private JTabbedPane tabbedPane; // TODO Isolate
+	private JTabbedPane tabbedPane;
 	
 	private JLabel lblReadsFile;
 	private JTextField txtReadsFile;
-	private JButton btnBrowse;
+	private JButton btnBrowseReadsFile;
+	private JLabel lblContigsFile;
+	private JTextField txtContigsFileLocation;
+	private JButton btnBrowseContigsFile;
 
 	private JPanel panelForMethodsParams;
 	private JLabel lblChooseAssemblyMethods;
@@ -40,6 +45,7 @@ public class GenomeAssemblyPanel extends JPanel {
 	private JSpinner spnKForDBG;
 	private JLabel lblMinimumOverlapLength;
 	private JSpinner spnMinOverlapLen;
+	private JFileChooser fileChooser;
 	
 	private JButton btnStartAssembly;
 	
@@ -57,7 +63,51 @@ public class GenomeAssemblyPanel extends JPanel {
 		txtReadsFile = new JTextField();
 		txtReadsFile.setColumns(10);
 		
-		btnBrowse = new JButton("Browse");
+		btnBrowseReadsFile = new JButton("Browse");
+		btnBrowseReadsFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				fileChooser = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("fasta files", "fasta");
+				fileChooser.setFileFilter(filter);
+				int browseForInput = fileChooser.showOpenDialog(null);
+				if (browseForInput == JFileChooser.APPROVE_OPTION) {
+					if (fileChooser.getSelectedFile() != null && fileChooser.getSelectedFile().getAbsolutePath().endsWith(".fasta"))
+						txtReadsFile.setText(fileChooser.getSelectedFile().getAbsolutePath());
+					else
+						JOptionPane.showMessageDialog(null, "Sorry! Only .fasta files allowed until now.");
+				} else if (browseForInput == JFileChooser.ERROR_OPTION) {
+					JOptionPane.showMessageDialog(null, "Sorry! An error has occurred. Please select reads file again.");
+					txtReadsFile.setText("");
+				}
+			}
+		});
+
+		lblContigsFile = new JLabel("Contigs File");
+		
+		txtContigsFileLocation = new JTextField();
+		txtContigsFileLocation.setColumns(10);
+		
+		btnBrowseContigsFile = new JButton("Browse");
+		btnBrowseContigsFile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				fileChooser = new JFileChooser();
+				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				fileChooser.setAcceptAllFileFilterUsed(false);
+				int browseForOutput = fileChooser.showSaveDialog(null);
+				String absolutePath = "";
+				if (browseForOutput == JFileChooser.APPROVE_OPTION) {
+					absolutePath = fileChooser.getSelectedFile().getAbsolutePath();
+					if (!absolutePath.endsWith("\\")) {
+						absolutePath = absolutePath + "\\";
+					}
+					txtContigsFileLocation.setText(absolutePath);
+				} else if (browseForOutput == JFileChooser.ERROR_OPTION) {
+					JOptionPane.showMessageDialog(null, "Sorry! An error has occurred. Please select output directory again.");
+					txtContigsFileLocation.setText("");
+				}
+			}
+		});
 				
 		panelForMethodsParams = new JPanel();
 		panelForMethodsParams.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
@@ -77,10 +127,21 @@ public class GenomeAssemblyPanel extends JPanel {
 		btnStartAssembly.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (txtReadsFile.getText().equals("")) {
-					JOptionPane.showMessageDialog(null, "Reads file left blank.", "No file selected", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Reads file field left blank.", "No file selected", JOptionPane.ERROR_MESSAGE);
 					return;
 				} else {
+					String readsFile = txtReadsFile.getText();
+					if (!readsFile.endsWith(".fasta")) {
+						JOptionPane.showMessageDialog(null, "<html><body>Reads file should be in <i>.fasta</i> format.</body></html>");
+						return;
+					}
 					Main.setReadsFile(txtReadsFile.getText());
+				}
+				if (txtContigsFileLocation.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "Contigs file field left blank.", "No file selected", JOptionPane.ERROR_MESSAGE);
+					return;
+				} else {
+					Main.setContigsFileLocation(txtContigsFileLocation.getText());
 				}
 				if (chckbxDeBruijnGraph.isSelected()) {
 					Main.addAssemblyMethod(Main.AssemblyMethods.DE_BRUIJN);
@@ -102,9 +163,20 @@ public class GenomeAssemblyPanel extends JPanel {
 				Main.setMinimumOverlapLength((int) spnMinOverlapLen.getValue());
 				Main.resetTime();
 				tabbedPane.setSelectedIndex(MainFrame.SummaryTabIndex);
-				SummaryPanel.startAssembly();
+				try {
+					SummaryPanel.startAssembly();
+				} catch (NullPointerException npe) {
+					System.err.println("Input file " + txtReadsFile.getText() + " is of wrong format.");
+					JOptionPane.showMessageDialog(null, "Contigs file is invalid. Supported file format content example:\n"
+							+ "\n"
+							+ ">Description\n"
+							+ "AGTCGAGCA...");
+				}
 			}
 		});
+		
+		
+		
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -116,15 +188,22 @@ public class GenomeAssemblyPanel extends JPanel {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
 							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-								.addComponent(scrollPaneForLstLog, GroupLayout.DEFAULT_SIZE, 656, Short.MAX_VALUE)
-								.addComponent(panelForMethodsParams, GroupLayout.DEFAULT_SIZE, 656, Short.MAX_VALUE)
+								.addComponent(scrollPaneForLstLog, GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
+								.addComponent(panelForMethodsParams, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addGroup(groupLayout.createSequentialGroup()
 									.addComponent(lblReadsFile)
+									.addGap(24)
+									.addComponent(txtReadsFile, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(txtReadsFile, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btnBrowse))
-								.addComponent(btnNext))))
+									.addComponent(btnBrowseReadsFile, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE))
+								.addComponent(btnNext)))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblContigsFile)
+							.addGap(18)
+							.addComponent(txtContigsFileLocation, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnBrowseContigsFile, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -134,14 +213,19 @@ public class GenomeAssemblyPanel extends JPanel {
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblReadsFile)
 						.addComponent(txtReadsFile, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnBrowse))
-					.addGap(41)
+						.addComponent(btnBrowseReadsFile))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblContigsFile)
+						.addComponent(txtContigsFileLocation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnBrowseContigsFile))
+					.addGap(21)
 					.addComponent(panelForMethodsParams, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE)
 					.addGap(36)
 					.addComponent(btnStartAssembly)
 					.addGap(38)
 					.addComponent(scrollPaneForLstLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
 					.addComponent(btnNext)
 					.addContainerGap())
 		);

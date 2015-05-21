@@ -38,7 +38,7 @@ public class ReadsGeneratorPanel extends JPanel {
 	private JButton btnNext;
 	private JTextArea txtDescription;
 	
-	private JTabbedPane tabbedPane; // TODO Isolate
+	private JTabbedPane tabbedPane;
 	
 	public ReadsGeneratorPanel(JTabbedPane tp) {
 		this.tabbedPane = tp;
