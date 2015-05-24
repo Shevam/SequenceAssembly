@@ -62,6 +62,7 @@ public class GenomeAssemblyPanel extends JPanel {
 		txtReadsFile.setColumns(10);
 		
 		btnBrowseReadsFile = new JButton("Browse");
+		btnBrowseReadsFile.setToolTipText("Browse for input fasta reads file");
 		btnBrowseReadsFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				fileChooser = new JFileChooser();
@@ -86,6 +87,7 @@ public class GenomeAssemblyPanel extends JPanel {
 		txtContigsFileLocation.setColumns(10);
 		
 		btnBrowseContigsFile = new JButton("Browse");
+		btnBrowseContigsFile.setToolTipText("Browse to output contigs location");
 		btnBrowseContigsFile.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -110,10 +112,12 @@ public class GenomeAssemblyPanel extends JPanel {
 		panelForMethodsParams = new JPanel();
 		panelForMethodsParams.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		JList<String> lstLog = new JList<String>();
+		lstLog.setToolTipText("Logs");
 		lstModel = new DefaultListModel<String>();
 		lstLog.setModel(lstModel);
 		
 		btnNext = new JButton("Next");
+		btnNext.setToolTipText("View summary");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				tabbedPane.setSelectedIndex(MainFrame.SummaryTabIndex);
@@ -250,11 +254,13 @@ public class GenomeAssemblyPanel extends JPanel {
 		lblKForDBG = new JLabel("k for De Bruijn graphs =");
 
 		spnKForDBG = new JSpinner();
+		spnKForDBG.setToolTipText("k is the number of characters on the edges (k-mer)");
 		spnKForDBG.setModel(new SpinnerNumberModel(new Integer(21), new Integer(1), null, new Integer(2)));
 
 		lblMinimumOverlapLength = new JLabel("Minimum overlap for overlap graphs = ");
 		
 		spnMinOverlapLen = new JSpinner();
+		spnMinOverlapLen.setToolTipText("The minimum number of characters that can overlap");
 		spnMinOverlapLen.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
 		
 		GroupLayout gl_panel = new GroupLayout(panelForMethodsParams);

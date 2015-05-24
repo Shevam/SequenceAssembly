@@ -50,6 +50,7 @@ public class ReadsGeneratorPanel extends JPanel {
 		txtSequenceFile.setColumns(10);
 		
 		btnBrowseSequenceFile = new JButton("Browse");
+		btnBrowseSequenceFile.setToolTipText("Browse for fasta sequence file");
 		btnBrowseSequenceFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				fileChooser = new JFileChooser();
@@ -71,11 +72,13 @@ public class ReadsGeneratorPanel extends JPanel {
 		lblReadSize = new JLabel("Read Size");
 		
 		spnReadSize = new JSpinner();
+		spnReadSize.setToolTipText("Maximum number of characters in a read");
 		spnReadSize.setModel(new SpinnerNumberModel(new Integer(200), new Integer(1), null, new Integer(1)));
 
 		lblMinimumOverlapLength = new JLabel("Minimum Overlap Length");
 		
 		spnMinOverlapLen = new JSpinner();
+		spnMinOverlapLen.setToolTipText("Minimum number of characters that can overlap between 2 reads");
 		spnMinOverlapLen.setModel(new SpinnerNumberModel(new Integer(10), new Integer(0), null, new Integer(1)));
 
 		lblOutputReadsFile = new JLabel("Output Reads File");
@@ -84,6 +87,7 @@ public class ReadsGeneratorPanel extends JPanel {
 		txtOutputReadsFile.setColumns(10);
 		
 		btnBrowseOutputReadsFile = new JButton("Browse");
+		btnBrowseOutputReadsFile.setToolTipText("Browse for output reads file");
 		btnBrowseOutputReadsFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				fileChooser = new JFileChooser();
@@ -125,6 +129,7 @@ public class ReadsGeneratorPanel extends JPanel {
 		});
 		
 		btnNext = new JButton("Next");
+		btnNext.setToolTipText("View genome assembler interface");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				tabbedPane.setSelectedIndex(MainFrame.GenomeAssemblerTabIndex);

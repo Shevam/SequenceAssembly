@@ -55,6 +55,7 @@ public class SummaryPanel extends JPanel {
 		});
 		
 		btnPrevious = new JButton("Previous");
+		btnPrevious.setToolTipText("View genome assembler and logs");
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tabbedPane.setSelectedIndex(MainFrame.GenomeAssemblerTabIndex);
@@ -62,6 +63,7 @@ public class SummaryPanel extends JPanel {
 		});
 
 		btnExit = new JButton("Exit");
+		btnExit.setToolTipText("Shut down application");
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
