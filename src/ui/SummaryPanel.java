@@ -26,26 +26,31 @@ import assembler.Main;
 public class SummaryPanel extends JPanel {
 	private static final long serialVersionUID = 3L;
 	private JTabbedPane tabbedPane;
-	final JFXPanel fxPanel;
+	final JFXPanel fxPanel_dbg;
+	final JFXPanel fxPanel_olp;
 	private static String greedy = "Greedy";
 	private static String overlap = "Overlap";
 	private static String deBruijn = "De Bruijn";
 	private static String improvedDBG = "Improved De Bruijn";
 	private JButton btnPrevious;
 	private JButton btnExit;
-	static ObservableList<Series<String, Number>> observableList;
-	static BarChart<String, Number> barChart;
+	static ObservableList<Series<String, Number>> observableList_dbg;
+	static ObservableList<Series<String, Number>> observableList_olp;
+	static BarChart<String, Number> barChart_dbg;
+	static BarChart<String, Number> barChart_olp;
 	
 	public SummaryPanel(JTabbedPane tp) {
 		this.tabbedPane = tp;
 		this.setSize(680, 550);
 		
-		fxPanel = new JFXPanel();
-		fxPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		fxPanel_dbg = new JFXPanel();
+		fxPanel_dbg.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		fxPanel_olp = new JFXPanel();
+		fxPanel_olp.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				initFX(fxPanel);
+				initFX(fxPanel_dbg, fxPanel_olp);
 			}
 		});
 		
@@ -62,28 +67,32 @@ public class SummaryPanel extends JPanel {
 				System.exit(0);
 			}
 		});
-		
+
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-							.addContainerGap()
+						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnPrevious)
 							.addPreferredGap(ComponentPlacement.RELATED, 532, Short.MAX_VALUE)
-							.addComponent(btnExit, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(22)
-							.addComponent(fxPanel, GroupLayout.PREFERRED_SIZE, 628, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
+							.addComponent(btnExit, GroupLayout.PREFERRED_SIZE, 55, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+							.addComponent(fxPanel_dbg, GroupLayout.PREFERRED_SIZE, 307, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(fxPanel_olp, GroupLayout.PREFERRED_SIZE, 307, GroupLayout.PREFERRED_SIZE)
+							.addGap(26))))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap(19, Short.MAX_VALUE)
-					.addComponent(fxPanel, GroupLayout.PREFERRED_SIZE, 479, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
+					.addGap(19)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(fxPanel_dbg, GroupLayout.PREFERRED_SIZE, 479, GroupLayout.PREFERRED_SIZE)
+						.addComponent(fxPanel_olp, GroupLayout.PREFERRED_SIZE, 479, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnExit)
 						.addComponent(btnPrevious))
@@ -92,10 +101,12 @@ public class SummaryPanel extends JPanel {
 		setLayout(groupLayout);
 	}
 	
-	private static void initFX(JFXPanel fxPanel) {
+	private static void initFX(JFXPanel fxPanel_dbg, JFXPanel fxPanel_olp) {
 		// This method is invoked on the JavaFX thread
-		Scene scene = createScene();
-		fxPanel.setScene(scene);
+		Scene scene_dbg = createSceneForDBG();
+		Scene scene_olp = createSceneForOLP();
+		fxPanel_dbg.setScene(scene_dbg);
+		fxPanel_olp.setScene(scene_olp);
 	}
 	
 	public static void startAssembly() {
@@ -119,8 +130,10 @@ public class SummaryPanel extends JPanel {
 						@Override
 						public void run() {
 							//barChart.setAnimated(false);
-							observableList.set(0, getGraphConstructionSeries());
-							observableList.set(1, getContigGenerationSeries());
+							observableList_dbg.set(0, getGraphConstructionSeriesForDBG());
+							observableList_dbg.set(1, getContigGenerationSeriesForDBG());
+							observableList_olp.set(0, getGraphConstructionSeriesForOLP());
+							observableList_olp.set(1, getContigGenerationSeriesForOLP());
 							//barChart.setAnimated(true);
 						}
 					});
@@ -130,44 +143,78 @@ public class SummaryPanel extends JPanel {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static Scene createScene() {
+	private static Scene createSceneForDBG() {
 		CategoryAxis xAxis = new CategoryAxis();
 		xAxis.setLabel("Method");
 		NumberAxis yAxis = new NumberAxis();
 		yAxis.setLabel("Time (ms)");
-		barChart = new BarChart<String, Number>(xAxis, yAxis);
-		barChart.setTitle("Genome Assembly Methods");
-		barChart.setCategoryGap(20);
-		barChart.setBarGap(2);
-		barChart.setVerticalGridLinesVisible(false);
-		barChart.setAnimated(false);
+		barChart_dbg = new BarChart<String, Number>(xAxis, yAxis);
+		barChart_dbg.setTitle("De Bruijn Methods");
+		barChart_dbg.setCategoryGap(20);
+		barChart_dbg.setBarGap(2);
+		barChart_dbg.setVerticalGridLinesVisible(false);
+		barChart_dbg.setAnimated(false);
 		xAxis.setAnimated(false);
 		yAxis.setAnimated(false);
 		
-		Scene scene = new Scene(barChart, 800, 600);
-		observableList = FXCollections.observableArrayList(getGraphConstructionSeries(), getContigGenerationSeries());
-		barChart.setData(observableList);
+		Scene scene = new Scene(barChart_dbg, 800, 600);
+		observableList_dbg = FXCollections.observableArrayList(getGraphConstructionSeriesForDBG(), getContigGenerationSeriesForDBG());
+		barChart_dbg.setData(observableList_dbg);
 		
 		return (scene);
 	}
 	
-	static Series<String, Number> getGraphConstructionSeries() {
+	@SuppressWarnings("unchecked")
+	private static Scene createSceneForOLP() {
+		CategoryAxis xAxis = new CategoryAxis();
+		xAxis.setLabel("Method");
+		NumberAxis yAxis = new NumberAxis();
+		yAxis.setLabel("Time (ms)");
+		barChart_olp = new BarChart<String, Number>(xAxis, yAxis);
+		barChart_olp.setTitle("Overlap Methods");
+		barChart_olp.setCategoryGap(20);
+		barChart_olp.setBarGap(2);
+		barChart_olp.setVerticalGridLinesVisible(false);
+		barChart_olp.setAnimated(false);
+		xAxis.setAnimated(false);
+		yAxis.setAnimated(false);
+		
+		Scene scene = new Scene(barChart_olp, 800, 600);
+		observableList_olp = FXCollections.observableArrayList(getGraphConstructionSeriesForOLP(), getContigGenerationSeriesForOLP());
+		barChart_olp.setData(observableList_olp);
+		
+		return (scene);
+	}
+	
+	static Series<String, Number> getGraphConstructionSeriesForDBG() {
 		BarChart.Series<String, Number> graphConstructionSeries = new BarChart.Series<String, Number>();
 		graphConstructionSeries.setName("Graph Construction");
 		graphConstructionSeries.getData().add(new BarChart.Data<String, Number>(deBruijn, Main.getGraphConstructionRunTime(Main.AssemblyMethods.DE_BRUIJN)));
-		graphConstructionSeries.getData().add(new BarChart.Data<String, Number>(overlap, Main.getGraphConstructionRunTime(Main.AssemblyMethods.OVERLAP)));
-		graphConstructionSeries.getData().add(new BarChart.Data<String, Number>(greedy, Main.getGraphConstructionRunTime(Main.AssemblyMethods.GREEDY)));
 		graphConstructionSeries.getData().add(new BarChart.Data<String, Number>(improvedDBG, Main.getGraphConstructionRunTime(Main.AssemblyMethods.IMPROVED_DE_BRUIJN)));
 		return graphConstructionSeries;
 	}
 	
-	static Series<String, Number> getContigGenerationSeries() {
+	static Series<String, Number> getContigGenerationSeriesForDBG() {
 		BarChart.Series<String, Number> contigGenerationSeries = new BarChart.Series<String, Number>();
 		contigGenerationSeries.setName("Contig Generation");
 		contigGenerationSeries.getData().add(new BarChart.Data<String, Number>(deBruijn, Main.getContigGenerationRunTime(Main.AssemblyMethods.DE_BRUIJN)));
+		contigGenerationSeries.getData().add(new BarChart.Data<String, Number>(improvedDBG, Main.getContigGenerationRunTime(Main.AssemblyMethods.IMPROVED_DE_BRUIJN)));
+		return contigGenerationSeries;
+	}
+	
+	static Series<String, Number> getGraphConstructionSeriesForOLP() {
+		BarChart.Series<String, Number> graphConstructionSeries = new BarChart.Series<String, Number>();
+		graphConstructionSeries.setName("Graph Construction");
+		graphConstructionSeries.getData().add(new BarChart.Data<String, Number>(overlap, Main.getGraphConstructionRunTime(Main.AssemblyMethods.OVERLAP)));
+		graphConstructionSeries.getData().add(new BarChart.Data<String, Number>(greedy, Main.getGraphConstructionRunTime(Main.AssemblyMethods.GREEDY)));
+		return graphConstructionSeries;
+	}
+	
+	static Series<String, Number> getContigGenerationSeriesForOLP() {
+		BarChart.Series<String, Number> contigGenerationSeries = new BarChart.Series<String, Number>();
+		contigGenerationSeries.setName("Contig Generation");
 		contigGenerationSeries.getData().add(new BarChart.Data<String, Number>(overlap, Main.getContigGenerationRunTime(Main.AssemblyMethods.OVERLAP)));
 		contigGenerationSeries.getData().add(new BarChart.Data<String, Number>(greedy, Main.getContigGenerationRunTime(Main.AssemblyMethods.GREEDY)));
-		contigGenerationSeries.getData().add(new BarChart.Data<String, Number>(improvedDBG, Main.getContigGenerationRunTime(Main.AssemblyMethods.IMPROVED_DE_BRUIJN)));
 		return contigGenerationSeries;
 	}
 }
