@@ -138,6 +138,11 @@ public class SummaryPanel extends JPanel {
 						}
 					});
 				}
+				try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+				GenomeAssemblyPanel.addToLstLog("De Bruijn Construction: " + observableList_dbg.get(0).getData().get(0).getYValue() + " ms & Contig generation: " + observableList_dbg.get(1).getData().get(0).getYValue() + " ms");
+				GenomeAssemblyPanel.addToLstLog("Overlap Construction: " + observableList_olp.get(0).getData().get(0).getYValue() + " ms & Contig generation: " + observableList_olp.get(1).getData().get(0).getYValue() + " ms");
+				GenomeAssemblyPanel.addToLstLog("Greedy Construction: " + observableList_olp.get(0).getData().get(1).getYValue() + " ms & Contig generation: " + observableList_olp.get(1).getData().get(1).getYValue() + " ms");
+				GenomeAssemblyPanel.addToLstLog("Improved de Bruijn Construction: " + observableList_dbg.get(0).getData().get(1).getYValue() + " ms & Contig generation: " + observableList_dbg.get(1).getData().get(1).getYValue() + " ms");
 			}
 		}.start();
 	}

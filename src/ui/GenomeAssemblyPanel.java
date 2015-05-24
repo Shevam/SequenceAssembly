@@ -3,6 +3,7 @@ package ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -12,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -48,9 +48,7 @@ public class GenomeAssemblyPanel extends JPanel {
 	private JFileChooser fileChooser;
 	
 	private JButton btnStartAssembly;
-	
-	private JScrollPane scrollPaneForLstLog;
-	private JList<String> lstLog;
+	private static DefaultListModel<String> lstModel;
 	
 	private JButton btnNext;
 	
@@ -111,10 +109,9 @@ public class GenomeAssemblyPanel extends JPanel {
 				
 		panelForMethodsParams = new JPanel();
 		panelForMethodsParams.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		
-		scrollPaneForLstLog = new JScrollPane();
-		lstLog = new JList<String>();
-		scrollPaneForLstLog.setViewportView(lstLog);
+		JList<String> lstLog = new JList<String>();
+		lstModel = new DefaultListModel<String>();
+		lstLog.setModel(lstModel);
 		
 		btnNext = new JButton("Next");
 		btnNext.addActionListener(new ActionListener() {
@@ -177,6 +174,8 @@ public class GenomeAssemblyPanel extends JPanel {
 		
 		
 		
+		
+		
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -188,7 +187,6 @@ public class GenomeAssemblyPanel extends JPanel {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
 							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-								.addComponent(scrollPaneForLstLog, GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
 								.addComponent(panelForMethodsParams, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addGroup(groupLayout.createSequentialGroup()
 									.addComponent(lblReadsFile)
@@ -203,7 +201,10 @@ public class GenomeAssemblyPanel extends JPanel {
 							.addGap(18)
 							.addComponent(txtContigsFileLocation, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnBrowseContigsFile, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(btnBrowseContigsFile, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lstLog, GroupLayout.PREFERRED_SIZE, 658, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -223,9 +224,9 @@ public class GenomeAssemblyPanel extends JPanel {
 					.addComponent(panelForMethodsParams, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE)
 					.addGap(36)
 					.addComponent(btnStartAssembly)
-					.addGap(38)
-					.addComponent(scrollPaneForLstLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+					.addComponent(lstLog, GroupLayout.PREFERRED_SIZE, 128, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
 					.addComponent(btnNext)
 					.addContainerGap())
 		);
@@ -311,5 +312,9 @@ public class GenomeAssemblyPanel extends JPanel {
 		setLayout(groupLayout);
 		
 		
+	}
+	
+	public static void addToLstLog(String s) {
+		lstModel.addElement(s);
 	}
 }
