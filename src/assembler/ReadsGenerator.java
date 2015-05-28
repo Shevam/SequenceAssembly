@@ -8,7 +8,13 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class ReadsGenerator
-{	
+{
+	public static void main(String args[])
+	{
+		generateReads("BorreliaFull_CompleteSequence.fasta", 500, 10, "generatedReads.fasta");
+		System.out.println(".....");
+	}
+	
 	public static String generateReads(String sequenceFile, int readSize, int minOverlapLength,String readsFile)
 	{
 		String sequence;
@@ -28,7 +34,7 @@ public class ReadsGenerator
 			sequence = sequenceBuilder.toString();
 		}
 		catch (FileNotFoundException | NullPointerException e) {
-			return sequenceFile + " not found. \n\n[" + e.getMessage() + "]";
+			return sequenceFile + " not found. [" + e.getMessage() + "]";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "An error occured while reading sequence. [" + e.getMessage() + "]";
@@ -49,17 +55,13 @@ public class ReadsGenerator
 		try 
 		{
 			writer = new BufferedWriter(new FileWriter(new File(readsFile)));
-			int sequenceSection=0, readCount=0, lineLength=80;
-			sequenceSection++;
-			int aRandomNumber = new Random().nextInt(readSize - minOverlapLength);
+			int aRandomNumber = 0, sequenceSection=1, readCount=0, lineLength=80;
 			while(sequenceSection*readSize<sequence.length())
 			{
 				String circularRead;
-				aRandomNumber = new Random().nextInt(readSize - minOverlapLength);
 				
 				if (((sequenceSection)*readSize)+aRandomNumber <= sequence.length()){
-					readCount++;
-					circularRead = sequence.substring(((sequenceSection-1)*readSize)+aRandomNumber, (sequenceSection*readSize)+aRandomNumber);
+					readCount++;circularRead = sequence.substring((sequenceSection-1)*readSize, sequenceSection*readSize);
 					writer.write(">r" + readCount + "\n");
 					for(int i=0;i<circularRead.length();i+=lineLength) {
 						if(i+lineLength > circularRead.length())
@@ -67,9 +69,10 @@ public class ReadsGenerator
 						else
 							writer.write(circularRead.substring(i, i+lineLength) + "\n");
 					}
-					
 					readCount++;
-					circularRead = sequence.substring((sequenceSection-1)*readSize, sequenceSection*readSize);
+					
+					aRandomNumber = new Random().nextInt(readSize - minOverlapLength);
+					circularRead = sequence.substring(((sequenceSection-1)*readSize)+aRandomNumber, (sequenceSection*readSize)+aRandomNumber);
 					writer.write(">r" + readCount + "\n");
 					for(int i=0;i<circularRead.length();i+=lineLength) {
 						if(i+lineLength > circularRead.length())

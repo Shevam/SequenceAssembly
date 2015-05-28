@@ -46,7 +46,7 @@ public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
 			System.out.println("Number of reads processed: " + readCount);
 		}
 		catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "File " + readsFile.getAbsolutePath() + " not found.");
+			JOptionPane.showMessageDialog(null, "File " + readsFile.getAbsolutePath() + " not found.");//will this cause a prob if run from console
 			System.err.println("File not found: " + readsFile);
 		}
 	}
