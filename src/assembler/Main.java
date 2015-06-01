@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Main
 {
-	public enum AssemblyMethods { DE_BRUIJN, OVERLAP, GREEDY,IMPROVED_DE_BRUIJN; };
+	public enum AssemblyMethods { OVERLAP, GREEDY, DE_BRUIJN, IMPROVED_DE_BRUIJN; };
 	
 	static String SEQUENCE_FILE;// = "BorreliaFull_CompleteSequence.fasta";
 	static String READS_FILE_NAME;// = "generatedReads.fasta";

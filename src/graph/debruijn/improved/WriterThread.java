@@ -12,7 +12,7 @@ public class WriterThread extends Thread
 	private static WriterThread instance = null;
 	private int contigCount;
 	public final BlockingQueue<LinkedList<DirectedEdge>> writerQueue;
-	public static int longestContig;
+	public static int longestContig, longestContigNo;
 	
 	public WriterThread(BufferedWriter w, int k)
 	{
@@ -20,6 +20,7 @@ public class WriterThread extends Thread
 		kmerSize = k;
 		contigCount = 0;
 		longestContig = 0;
+		longestContigNo = 0;
 		this.writerQueue = new LinkedBlockingQueue<LinkedList<DirectedEdge>>();
 		instance = this;
 		this.run();
@@ -90,8 +91,10 @@ public class WriterThread extends Thread
 			if (contigEdgeList.size()>1)
 				printContigInFastaFormat(writer, contigEdgeList, contigCount, kmerSize);
 			
-			if (longestContig < contigEdgeList.size()+kmerSize-1)
+			if (longestContig < contigEdgeList.size()+kmerSize-1){
 				longestContig = contigEdgeList.size()+kmerSize-1;
+				longestContigNo = contigCount;
+			}
 		}
 	}
 }

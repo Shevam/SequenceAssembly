@@ -8,13 +8,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class ReadsGenerator
-{
-	public static void main(String args[])
-	{
-		generateReads("BorreliaFull_CompleteSequence.fasta", 500, 10, "generatedReads.fasta");
-		System.out.println(".....");
-	}
-	
+{	
 	public static String generateReads(String sequenceFile, int readSize, int minOverlapLength,String readsFile)
 	{
 		String sequence;

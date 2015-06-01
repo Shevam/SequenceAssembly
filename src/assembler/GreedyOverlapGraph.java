@@ -75,6 +75,7 @@ public class GreedyOverlapGraph extends OverlapGraph implements IGraph{
 		        printContigInFastaFormat(writer, contigNodeList, contigCount);
 			}
 			System.out.println("Number of contigs generated: " + contigCount);
+			System.err.println("Longest contig number: " + longestContigNo);
 			writer.close();
 		}
 		catch (FileNotFoundException e) {

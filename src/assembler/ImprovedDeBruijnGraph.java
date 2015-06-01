@@ -111,6 +111,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 			
 			System.out.println("Number of contigs generated: " + WriterThread.getInstance().getContigCount());
 			System.out.println("Longest contig length: " + WriterThread.longestContig);
+			System.err.println("Longest contig No: " + WriterThread.longestContigNo);
 			writer.close();
 		} catch (IOException e) {
 			System.err.println("ImprovedDeBruijnGraph:generateContigs: file "+generatedContigsFile+" cannot be created or opened");

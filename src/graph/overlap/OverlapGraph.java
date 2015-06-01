@@ -13,6 +13,7 @@ public abstract class OverlapGraph implements IGraph {
 	private LinkedHashMap<String, Node> nodeList;
 	private HashMap<Node, LinkedList<DirectedEdge>> adjacencyList;
 	private Node leastIndegreeNode;
+	public int longestContigNo, longestContigLength = 0;
 	
 	protected OverlapGraph(int minimumOverlapLength) {
 		OverlapGraph.minimumOverlapLength = minimumOverlapLength;
@@ -165,6 +166,11 @@ public abstract class OverlapGraph implements IGraph {
 		try{
 			int writerRemainingLineSpace = 0;
 			String contigPart;
+			
+			if (contigNodeList.size() > longestContigLength) {
+				longestContigLength = contigNodeList.size();
+				longestContigNo = contigCount;
+			}
 			
         	writer.write(">c" + contigCount + "_NodeCount_"+ contigNodeList.size() +"\n");
 			contigPart = contigNodeList.getFirst().getRead();

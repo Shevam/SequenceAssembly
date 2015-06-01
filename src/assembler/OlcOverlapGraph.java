@@ -97,6 +97,7 @@ public class OlcOverlapGraph extends OverlapGraph implements IGraph {
 			}
 			
 			System.out.println("Number of contigs generated: " + contigCount);
+			System.err.println("Longest contig number: " + longestContigNo);
 			writer.close();
 		}
 		catch (FileNotFoundException e) {

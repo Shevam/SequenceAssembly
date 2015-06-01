@@ -59,7 +59,7 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 		DirectedEdge unvisitedEdge;
 		BufferedWriter writer;
 		int contigCount = 0;
-		int longestContig = 0;
+		int longestContig = 0, longestContigNo = 0;
 		boolean newContigEdgeAdded;
 		try {
 			writer = new BufferedWriter(new FileWriter(new File(outputFile)));
@@ -73,7 +73,6 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 					unvisitedEdge.setVisited();
 					newContigEdgeAdded = true;
 					while (!contigEdgeList.isEmpty()) {
-						System.out.print(".");
 						unvisitedEdge = this.getUnvisitedEdge(contigEdgeList.getLast().getEnd());
 						if (unvisitedEdge!=null) {
 							unvisitedEdge.setVisited();
@@ -86,8 +85,10 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 								printContigInFastaFormat(writer,contigEdgeList, contigCount, this.getK());
 								newContigEdgeAdded = false;
 								
-								if (longestContig < contigEdgeList.size()+this.getK()-1)
+								if (longestContig < contigEdgeList.size()+this.getK()-1) {
 									longestContig = contigEdgeList.size()+this.getK()-1;
+									longestContigNo = contigCount;
+								}
 							}
 							contigEdgeList.removeLast();
 						}
@@ -97,6 +98,7 @@ public class TypicalDeBruijnGraph extends DeBruijnGraph implements IGraph{
 			writer.close();
 			System.out.println("Number of contigs generated: "+contigCount);
 			System.out.println("Longest contig length: " + longestContig);
+			System.err.println("Longest contig number: " + longestContigNo);
 		}
 		catch (FileNotFoundException e) {
 			System.err.println("File not found: " + outputFile);
