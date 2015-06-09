@@ -6,7 +6,7 @@ public class Main
 {
 	public enum AssemblyMethods { OVERLAP, GREEDY, DE_BRUIJN, IMPROVED_DE_BRUIJN; };
 	
-	static String SEQUENCE_FILE;// = "BorreliaFull_CompleteSequence.fasta";
+	static String SEQUENCE_FILE;// = "Borrelia-bissettii_shortened.fasta";
 	static String READS_FILE_NAME;// = "generatedReads.fasta";
 	static String GENERATED_CONTIGS_FILE_LOCATION;// = "generatedContigs.fasta";
 	static int MINIMUM_OVERLAP_LENGTH = 10;
@@ -35,25 +35,7 @@ public class Main
 		programStartTime = System.nanoTime();
 		isCompleted = false;
 		for (AssemblyMethods method : assemblyMethods) {
-			switch (method) {
-			case DE_BRUIJN:
-				System.out.println("Method: DeBruijnGraph");
-				
-				dbgGraphConstructionStartTime = System.nanoTime();
-				TypicalDeBruijnGraph dbg = new TypicalDeBruijnGraph();
-				dbg.constructGraph(new File(READS_FILE_NAME), K);
-				dbgGraphConstructionEndTime = System.nanoTime();
-				System.out.println("Time to construct graph(ms): " + (dbgGraphConstructionEndTime - dbgGraphConstructionStartTime) / 1000000);
-				
-				dbgContigGenerationStartTime = System.nanoTime();
-				dbg.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE_LOCATION + "DBG_GeneratedContigs.fasta");
-				dbgContigGenerationEndTime = System.nanoTime();
-				System.out.println("Time to generate contigs(ms): " + (dbgContigGenerationEndTime - dbgContigGenerationStartTime) / 1000000);
-				
-				dbg = null;
-				System.gc();
-				break;
-				
+			switch (method) {	
 			case OVERLAP:
 				System.out.println("Method: OverlapGraph");
 				overlapGraphConstructionStartTime = System.nanoTime();
@@ -83,6 +65,24 @@ public class Main
 				greedyContigGenerationEndTime = System.nanoTime();
 				System.out.println("Time to generate contigs(ms): " + (greedyContigGenerationEndTime - greedyContigGenerationStartTime) / 1000000);
 				gog = null;
+				System.gc();
+				break;
+			
+			case DE_BRUIJN:
+				System.out.println("Method: DeBruijnGraph");
+				
+				dbgGraphConstructionStartTime = System.nanoTime();
+				TypicalDeBruijnGraph dbg = new TypicalDeBruijnGraph();
+				dbg.constructGraph(new File(READS_FILE_NAME), K);
+				dbgGraphConstructionEndTime = System.nanoTime();
+				System.out.println("Time to construct graph(ms): " + (dbgGraphConstructionEndTime - dbgGraphConstructionStartTime) / 1000000);
+				
+				dbgContigGenerationStartTime = System.nanoTime();
+				dbg.traverseGraphToGenerateContigs(GENERATED_CONTIGS_FILE_LOCATION + "DBG_GeneratedContigs.fasta");
+				dbgContigGenerationEndTime = System.nanoTime();
+				System.out.println("Time to generate contigs(ms): " + (dbgContigGenerationEndTime - dbgContigGenerationStartTime) / 1000000);
+				
+				dbg = null;
 				System.gc();
 				break;
 				
@@ -164,12 +164,6 @@ public class Main
 	
 	public static long getGraphConstructionRunTime(AssemblyMethods assemblyMethod) {
 		switch(assemblyMethod) {
-		case DE_BRUIJN:
-			if (dbgGraphConstructionStartTime != 0 && dbgGraphConstructionEndTime == 0)
-				return (System.nanoTime() - dbgGraphConstructionStartTime) / 1000000;
-			else
-				return (dbgGraphConstructionEndTime - dbgGraphConstructionStartTime) / 1000000;
-		
 		case OVERLAP:
 			if (overlapGraphConstructionStartTime != 0 && overlapGraphConstructionEndTime == 0)
 				return (System.nanoTime() - overlapGraphConstructionStartTime) / 1000000;
@@ -181,7 +175,13 @@ public class Main
 				return (System.nanoTime() - greedyGraphConstructionStartTime) / 1000000;
 			else
 				return (greedyGraphConstructionEndTime - greedyGraphConstructionStartTime) / 1000000;
-			
+		
+		case DE_BRUIJN:
+			if (dbgGraphConstructionStartTime != 0 && dbgGraphConstructionEndTime == 0)
+				return (System.nanoTime() - dbgGraphConstructionStartTime) / 1000000;
+			else
+				return (dbgGraphConstructionEndTime - dbgGraphConstructionStartTime) / 1000000;
+		
 		case IMPROVED_DE_BRUIJN:
 			if (impDbgGraphConstructionStartTime != 0 && impDbgGraphConstructionEndTime == 0)
 				return (System.nanoTime() - impDbgGraphConstructionStartTime) / 1000000;
@@ -195,11 +195,6 @@ public class Main
 	
 	public static long getContigGenerationRunTime(AssemblyMethods assemblyMethod) {
 		switch(assemblyMethod) {
-		case DE_BRUIJN:
-			if (dbgContigGenerationStartTime != 0 && dbgContigGenerationEndTime == 0)
-				return (System.nanoTime() - dbgContigGenerationStartTime) / 1000000;
-			else
-				return (dbgContigGenerationEndTime - dbgContigGenerationStartTime) / 1000000;
 		
 		case OVERLAP:
 			if (overlapContigGenerationStartTime != 0 && overlapContigGenerationEndTime == 0)
@@ -212,6 +207,12 @@ public class Main
 				return (System.nanoTime() - greedyContigGenerationStartTime) / 1000000;
 			else
 				return (greedyContigGenerationEndTime - greedyContigGenerationStartTime) / 1000000;
+		
+		case DE_BRUIJN:
+			if (dbgContigGenerationStartTime != 0 && dbgContigGenerationEndTime == 0)
+				return (System.nanoTime() - dbgContigGenerationStartTime) / 1000000;
+			else
+				return (dbgContigGenerationEndTime - dbgContigGenerationStartTime) / 1000000;
 			
 		case IMPROVED_DE_BRUIJN:
 			if (impDbgContigGenerationStartTime != 0 && impDbgContigGenerationEndTime == 0)

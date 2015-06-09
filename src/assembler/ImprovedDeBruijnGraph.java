@@ -73,8 +73,8 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 		try {
 			writer = new BufferedWriter(new FileWriter(new File(generatedContigsFile)));
 			new WriterThread(writer, this.getK());
-			//noOfConcurrentThreads = Runtime.getRuntime().availableProcessors();
-			noOfConcurrentThreads = 4;
+			noOfConcurrentThreads = Runtime.getRuntime().availableProcessors();
+			//noOfConcurrentThreads = 4;
 			
 			System.out.println("Number of concurrent threads: "+noOfConcurrentThreads);
 			es = Executors.newFixedThreadPool(noOfConcurrentThreads);
@@ -102,7 +102,7 @@ public class ImprovedDeBruijnGraph extends ImprovedDBG implements IGraph{
 	        
 			es.shutdown();
 			try {
-				finished = es.awaitTermination(5, TimeUnit.MINUTES);
+				finished = es.awaitTermination(10, TimeUnit.MINUTES);
 				if(!finished)
 					System.err.println("ImprovedDeBruijnGraph:generateContigs: a traversal thread's timeout elapsed before finishing execution");
 			} catch (InterruptedException e) {
